@@ -109,6 +109,12 @@
                  '&body=' + encodeURIComponent(body);
       // show success state
       form.classList.add('ok');
+      // an investor-deck request unlocks the gated financials on the page
+      if (/deck|financ|invest/i.test(subject)) {
+        document.querySelectorAll('[data-financials]').forEach(function (f) {
+          f.classList.add('unlocked');
+        });
+      }
       // open the user's mail client (prototype has no backend)
       try { window.location.href = href; } catch (err) { /* no-op */ }
     });

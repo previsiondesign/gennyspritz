@@ -148,3 +148,145 @@ p { margin: 0 0 1em; }
 }
 .js-form.ok .form-success { display: flex; }
 .js-form.ok .form-fields { display: none; }
+
+/* ============================================================
+   Shared: floating "back to all 3 directions" button
+   ============================================================ */
+.back-directions {
+  position: fixed; left: 22px; bottom: 22px; z-index: 150;
+  display: inline-flex; align-items: center; gap: 9px;
+  background: var(--ink); color: #fff; text-decoration: none;
+  font-family: var(--font-label); font-weight: 500; font-size: .8rem; letter-spacing: .03em;
+  padding: 12px 18px 12px 15px; border-radius: 40px;
+  box-shadow: 0 12px 30px -10px rgba(0,0,0,.5);
+  transition: transform .25s var(--ease), background .25s var(--ease);
+}
+.back-directions:hover { transform: translateY(-2px); background: var(--forest); color: #fff; }
+.back-directions svg { width: 15px; height: 15px; flex: none; }
+@media (max-width: 600px) {
+  .back-directions { left: 12px; bottom: 12px; padding: 10px 15px 10px 13px; font-size: .74rem; }
+}
+@media print { .back-directions { display: none; } }
+
+/* ============================================================
+   Shared: gated financials (locked → unlock on deck request)
+   Works on both light and dark variant sections.
+   ============================================================ */
+.financials { margin-top: 30px; }
+.fin-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px;
+  flex-wrap: wrap; margin-bottom: 16px; }
+.fin-head h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.3rem; }
+.fin-illustrative { font-style: italic; font-size: .8rem; opacity: .8; }
+.fin-locked-wrap { position: relative; border-radius: 12px; overflow: hidden; }
+.fin-content { transition: filter .45s var(--ease); }
+.financials:not(.unlocked) .fin-content { filter: blur(9px); pointer-events: none; user-select: none; }
+.fin-lock { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  padding: 20px; background: rgba(34,40,34,.30); transition: opacity .45s ease, visibility .45s ease; }
+.financials.unlocked .fin-lock { opacity: 0; visibility: hidden; }
+.fin-lock-card { background: var(--cream); color: var(--ink); border-radius: 12px;
+  padding: 30px 34px; text-align: center; max-width: 400px;
+  box-shadow: 0 24px 60px -22px rgba(0,0,0,.55); }
+.fin-lock-card .lock-ico { display: inline-flex; align-items: center; justify-content: center;
+  width: 52px; height: 52px; border-radius: 50%; background: var(--sage-soft); margin-bottom: 6px; }
+.fin-lock-card .lock-ico svg { width: 24px; height: 24px; color: var(--forest); }
+.fin-lock-card h4 { font-family: var(--font-display); font-weight: 600; font-size: 1.35rem; margin: .4em 0 .35em; }
+.fin-lock-card p { color: var(--muted); font-size: .95rem; margin-bottom: 1.2em; line-height: 1.5; }
+
+/* financial content primitives */
+.fin-years { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; margin-bottom: 16px; }
+.fin-year { background: var(--cream); border: 1px solid var(--line); border-radius: 10px;
+  padding: 16px 12px; text-align: center; }
+.fin-year span { display: block; font-family: var(--font-label); text-transform: uppercase;
+  letter-spacing: .08em; font-size: .64rem; color: var(--muted); margin-bottom: 4px; }
+.fin-year strong { display: block; font-family: var(--font-head); font-size: 1.5rem; color: var(--forest); line-height: 1.05; }
+.fin-year em { font-style: normal; font-size: .68rem; color: var(--muted); }
+.fin-grid3 { display: grid; grid-template-columns: 1.1fr 1fr 1.1fr; gap: 14px; }
+.fin-mini { background: var(--cream); border: 1px solid var(--line); border-radius: 10px; padding: 22px; }
+.fin-mini h4 { font-family: var(--font-label); text-transform: uppercase; letter-spacing: .08em;
+  font-size: .7rem; color: var(--muted); margin-bottom: 16px; }
+.wf { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; }
+.wf li { display: grid; grid-template-columns: 92px 1fr auto; align-items: center; gap: 10px; font-size: .84rem; color: var(--ink); }
+.wf .wf-bar { height: 12px; border-radius: 6px; }
+.wf b { font-family: var(--font-display); font-weight: 600; }
+.fin-donut { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.fin-donut svg { width: 116px; height: 116px; flex: none; }
+.fin-donut ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.fin-donut li { display: flex; align-items: center; gap: 9px; font-size: .82rem; color: var(--ink); }
+.fin-donut .dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.fin-donut b { margin-left: auto; font-family: var(--font-display); }
+.hbars { list-style: none; margin: 0; padding: 0; display: grid; gap: 13px; }
+.hbars li { font-size: .8rem; color: var(--ink); }
+.hbars .hbars-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.hbars .track { background: var(--linen-deep); border-radius: 5px; height: 10px; overflow: hidden; }
+.hbars .fill { height: 10px; border-radius: 5px; background: var(--sage-deep); }
+.hbars li.hi .fill { background: var(--coral); }
+.hbars li.hi b { color: var(--coral); }
+@media (max-width: 760px) {
+  .fin-years { grid-template-columns: repeat(2,1fr); }
+  .fin-grid3 { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   Shared content modules (deck content added across variants).
+   Live on light backgrounds; section headings use each variant's
+   own header classes so fonts stay variant-consistent.
+   ============================================================ */
+.cm { padding: 86px 0; }
+.cm-bg-linen { background: var(--linen); }
+.cm-bg-cream { background: var(--cream); }
+.cm-bg-sage  { background: var(--sage-soft); }
+
+/* competitive landscape */
+.cm-compare { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; align-items: stretch; }
+.cm-col { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 30px 28px; }
+.cm-col-label { font-family: var(--font-label); text-transform: uppercase; letter-spacing: .1em;
+  font-size: .72rem; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
+.cm-col h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.4rem; margin-bottom: 16px; }
+.cm-col ul { list-style: none; margin: 0; padding: 0; }
+.cm-col li { position: relative; padding: 0 0 9px 22px; color: #45433d; font-size: .96rem; }
+.cm-col li::before { content: "–"; position: absolute; left: 4px; color: var(--taupe); }
+.cm-col.win { background: var(--forest); border-color: var(--forest); }
+.cm-col.win .cm-col-label { color: var(--sage-deep); }
+.cm-col.win h3 { color: #fff; }
+.cm-col.win li { color: #d6dfd1; }
+.cm-col.win li::before { content: "✓"; color: var(--sage-deep); font-weight: 700; }
+
+/* meet the genny drinker */
+.cm-drinker { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px,1fr)); gap: 18px; }
+.cm-pt { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 26px 24px; }
+.cm-pt .cm-pt-ico { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px;
+  border-radius: 50%; background: var(--sage-soft); color: var(--forest); margin-bottom: 14px; }
+.cm-pt .cm-pt-ico svg { width: 22px; height: 22px; }
+.cm-pt h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; margin-bottom: 5px; }
+.cm-pt p { margin: 0; color: var(--muted); font-size: .92rem; }
+
+/* the intersection (flavor/format/function/finance) */
+.cm-quad { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; }
+.cm-q { text-align: center; background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 30px 22px; }
+.cm-q .cm-q-ico { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px;
+  border-radius: 16px; background: var(--sage-soft); color: var(--forest); margin-bottom: 16px; }
+.cm-q .cm-q-ico svg { width: 28px; height: 28px; }
+.cm-q h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.3rem; margin-bottom: .35em; }
+.cm-q p { margin: 0; color: var(--muted); font-size: .94rem; }
+.cm-quad-total { text-align: center; margin: 30px auto 0; font-family: var(--font-display); font-style: italic;
+  font-size: 1.2rem; color: var(--forest); }
+.cm-quad-total b { font-style: normal; }
+
+/* aesthetic band */
+.cm-aesthetic { max-width: 900px; margin: 0 auto; text-align: center; }
+.cm-aesthetic blockquote { margin: 0; font-family: var(--font-head); font-style: italic; font-weight: 400;
+  font-size: clamp(1.4rem, 3vw, 2.1rem); line-height: 1.36; color: var(--forest); }
+.cm-aesthetic .cm-aes-src { margin-top: 1.3em; font-family: var(--font-label); text-transform: uppercase;
+  letter-spacing: .2em; font-size: .72rem; color: var(--muted); }
+.cm-aesthetic .cm-aes-split { display: inline-flex; gap: 14px; margin-top: 26px; flex-wrap: wrap; justify-content: center; }
+.cm-aesthetic .cm-aes-split span { background: var(--paper); border: 1px solid var(--line); border-radius: 40px;
+  padding: 9px 20px; font-size: .9rem; color: #45433d; }
+.cm-aesthetic .cm-aes-split b { color: var(--coral); }
+
+@media (max-width: 880px) {
+  .cm-compare { grid-template-columns: 1fr; }
+  .cm-quad { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 520px) {
+  .cm-quad { grid-template-columns: 1fr; }
+}
