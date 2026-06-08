@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>genny · the wine drinker's spritz</title>
+<meta name="description" content="genny is a crafted wine spritz — real bubbles, no sugar added, low alcohol, and beautifully unexpected flavors. Honeysuckle, cucumber, rhubarb. Launching January 2027." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232C4233'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' fill='white' text-anchor='middle'%3Eg%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Jost:wght@300;400;500;600;700&family=Lato:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/brand.css" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav-bar" data-header>
+  <div class="container nav-inner">
+    <a href="#top" class="brand wordmark">genny</a>
+    <button class="nav-toggle" data-nav-toggle aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" data-nav aria-label="Primary">
+      <a href="#flavors">Flavors</a>
+      <a href="#why">Why genny</a>
+      <a href="#story">Our name</a>
+      <a href="#invest">Investors</a>
+      <a href="#list" class="nav-cta">Join the list</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-card">
+        <div class="hero-copy">
+          <span class="pill-tag">Launching January 2027</span>
+          <h1>Good wine.<br>Real bubbles.<br><span class="hl">Zero apology.</span></h1>
+          <p>genny is a crafted wine spritz — low in alcohol, no sugar added, and full of
+            beautifully unexpected flavor. The wine drinker's spritz, finally.</p>
+          <form class="js-form hero-form" data-subject="Add me to the genny launch list"
+                data-mailto="natashaik@icloud.com" novalidate>
+            <div class="form-fields">
+              <input type="email" name="email" data-label="Email" placeholder="Enter your email" aria-label="Email address" required />
+              <button type="submit" class="btn-fill">Join the list →</button>
+            </div>
+            <div class="form-success" role="status">✓ You're in — see you at launch.</div>
+          </form>
+          <ul class="trust">
+            <li>6.5% ABV</li><li>No sugar added</li><li>250ml</li><li>Female owned</li>
+          </ul>
+        </div>
+        <div class="hero-cans">
+          <img src="../assets/cans-trio.png" alt="The three genny spritz cans — honeysuckle, cucumber and rhubarb." />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MARQUEE ============ -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>No sugar added</span><span>•</span><span>Low alcohol</span><span>•</span>
+      <span>Real bubbles</span><span>•</span><span>Quality white wine</span><span>•</span>
+      <span>Natural flavors</span><span>•</span><span>Made to be seen</span><span>•</span>
+      <span>No sugar added</span><span>•</span><span>Low alcohol</span><span>•</span>
+      <span>Real bubbles</span><span>•</span><span>Quality white wine</span><span>•</span>
+      <span>Natural flavors</span><span>•</span><span>Made to be seen</span><span>•</span>
+    </div>
+  </div>
+
+  <!-- ============ FLAVORS ============ -->
+  <section class="flavors" id="flavors">
+    <div class="container">
+      <header class="head-center">
+        <span class="eyebrow">Three to start</span>
+        <h2>Pick your spritz.</h2>
+        <p>Unique flavors that complement wine — all the freshness, none of the sweet.</p>
+      </header>
+      <div class="tile-row">
+        <article class="tile reveal tile-honeysuckle">
+          <div class="tile-can"><img src="../assets/can-honeysuckle.png" alt="genny honeysuckle spritz" /></div>
+          <div class="tile-body">
+            <span class="tile-tag">Floral &amp; fragrant</span>
+            <h3>Honeysuckle</h3>
+            <p>Soft and aromatic with a whisper of garden sweetness — no sugar required.</p>
+          </div>
+        </article>
+        <article class="tile reveal tile-cucumber" data-delay="1">
+          <div class="tile-can"><img src="../assets/can-cucumber.png" alt="genny cucumber spritz" /></div>
+          <div class="tile-body">
+            <span class="tile-tag">Crisp &amp; cooling</span>
+            <h3>Cucumber</h3>
+            <p>Clean, green and endlessly refreshing — the easiest yes on a warm afternoon.</p>
+          </div>
+        </article>
+        <article class="tile reveal tile-rhubarb" data-delay="2">
+          <div class="tile-can"><img src="../assets/can-rhubarb.png" alt="genny rhubarb spritz" /></div>
+          <div class="tile-body">
+            <span class="tile-tag">Bright &amp; tart</span>
+            <h3>Rhubarb</h3>
+            <p>A garden-tart edge that's familiar yet unexpected. Your new house pour.</p>
+          </div>
+        </article>
+      </div>
+      <p class="coming">More on the way — <em>lavender · hibiscus · rose hips · basil · pomegranate</em></p>
+    </div>
+  </section>
+
+  <!-- ============ WHY ============ -->
+  <section class="why" id="why">
+    <div class="container">
+      <header class="head-center light">
+        <span class="eyebrow">Why genny</span>
+        <h2>One drink that delivers on all four.</h2>
+        <p>Flavor, format, function and finance — the intersection of everything people actually want.</p>
+      </header>
+      <div class="why-grid">
+        <div class="why-card reveal">
+          <span class="why-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.7a3 3 0 0 0 1.9 1.9L21.5 12l-5.7 1.9a3 3 0 0 0-1.9 1.9L12 21.5l-1.9-5.7a3 3 0 0 0-1.9-1.9L2.5 12l5.7-1.9a3 3 0 0 0 1.9-1.9z"/></svg></span>
+          <h3>Flavor</h3><p>Unique, non-sweet flavors that complement quality white wine.</p>
+        </div>
+        <div class="why-card reveal" data-delay="1">
+          <span class="why-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="18" rx="2.6"/><path d="M8.4 7.5h7.2"/><path d="M8.4 16.5h7.2"/></svg></span>
+          <h3>Format</h3><p>A sleek 250ml can. Modern, clean, single-serve — made to be seen.</p>
+        </div>
+        <div class="why-card reveal" data-delay="2">
+          <span class="why-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10l-1.2 8a3.8 3.8 0 0 1-7.6 0L7 3z"/><path d="M12 14v5"/><path d="M9 21h6"/></svg></span>
+          <h3>Function</h3><p>Low 6.5% ABV and no sugar added. Light, sessionable, wellness-aligned.</p>
+        </div>
+        <div class="why-card reveal" data-delay="3">
+          <span class="why-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-1.8 2.5-1.8s2.5.7 2.5 1.9c0 2.6-5 1.3-5 3.9 0 1.2 1.1 1.9 2.5 1.9s2.5-.6 2.5-1.8"/></svg></span>
+          <h3>Finance</h3><p>A 4-pack for under $20 — premium experience at an accessible price.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STORY ============ -->
+  <section class="story" id="story">
+    <div class="container story-card">
+      <figure class="story-pic">
+        <img src="../assets/og-genny.jpg" alt="The original Genny — Natasha's mother — in a pink feather boa." />
+      </figure>
+      <div class="story-text">
+        <span class="eyebrow">The story behind the name</span>
+        <h2>Meet the original Genny.</h2>
+        <p>genny is named for my mom — a 90-year-young Frenchwoman born <em>Genevieve</em>. When she came
+          to America, she didn't love how her name sounded in English, so she renamed herself. So her.</p>
+        <p>Her drink of choice was White Zinfandel — until someone shamed her for it and quietly took the
+          joy right out of her glass. I never forgot that.</p>
+        <p>genny is for her, and for everyone who just wants something delicious in their hand. No judging.
+          No apology. Just something yummy.</p>
+        <p class="kicker">Because what you like matters. Full stop.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHY NOW (stats) ============ -->
+  <section class="stats">
+    <div class="container">
+      <header class="head-center light">
+        <span class="eyebrow">Why now</span>
+        <h2>The category is moving genny's way.</h2>
+      </header>
+      <div class="stat-row">
+        <div class="stat reveal"><strong>+14%</strong><span>Wine-based RTD growth in 2025</span></div>
+        <div class="stat reveal" data-delay="1"><strong>#1</strong><span>RTDs overtook vodka in global value</span></div>
+        <div class="stat reveal" data-delay="2"><strong>Low/no</strong><span>-alcohol wine poised for strong growth</span></div>
+        <div class="stat reveal" data-delay="3"><strong>White space</strong><span>No brand owns the elevated occasion</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOUNDER ============ -->
+  <section class="founder">
+    <div class="container founder-card">
+      <figure class="founder-pic"><img src="../assets/founder-natasha.jpg" alt="Natasha Hayes, founder of genny." /></figure>
+      <div class="founder-text">
+        <span class="eyebrow">Founder</span>
+        <h2>Built by a 20-year wine pro.</h2>
+        <p>Natasha Hayes spent 20+ years scaling brands across Constellation, Treasury Wine Estates,
+          Jackson Family Wines, Crimson Wine Group and WX Brands — to $150M and 100K+ cases.</p>
+        <p class="founder-q">“I'm passionate about wine but not precious about it. The best is yet to come
+          when more people get to be part of it.”</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INVESTORS ============ -->
+  <section class="invest" id="invest">
+    <div class="container invest-card">
+      <div class="invest-copy">
+        <span class="eyebrow">For investors</span>
+        <h2>We're raising <span class="hl-coral">$500K</span> to launch.</h2>
+        <p>genny is a crafted wine spritz at the intersection of premium RTD and functional wellness —
+          in a fast-growing category where no brand yet owns the elevated-occasion white space. We're
+          raising $500,000 via SAFE to fund the January 2027 launch.</p>
+        <div class="invest-stats">
+          <div><strong>$500K</strong><span>Raise · SAFE</span></div>
+          <div><strong>60.6%</strong><span>Gross margin at launch</span></div>
+          <div><strong>Jan 2027</strong><span>Launch</span></div>
+        </div>
+        <p class="gated">Full financials, projections &amp; terms are in the deck.</p>
+        <button class="btn-fill btn-coral-fill" data-open-deck>Request the investor deck →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ JOIN LIST ============ -->
+  <section class="join" id="list">
+    <div class="container join-card">
+      <h2>Be first to sip.</h2>
+      <p>Join the list for launch news and where to find genny near you.</p>
+      <form class="js-form join-form" data-subject="Add me to the genny launch list"
+            data-mailto="natashaik@icloud.com" novalidate>
+        <div class="form-fields">
+          <input type="email" name="email" data-label="Email" placeholder="you@email.com" aria-label="Email address" required />
+          <button type="submit" class="btn-fill">Keep me posted</button>
+        </div>
+        <div class="form-success" role="status">✓ You're on the list — see you in January 2027.</div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="foot">
+  <div class="container foot-inner">
+    <div>
+      <span class="wordmark foot-word">genny</span>
+      <p class="foot-tag">Spritz, Elevated</p>
+    </div>
+    <nav class="foot-nav" aria-label="Footer">
+      <a href="#flavors">Flavors</a><a href="#why">Why genny</a>
+      <a href="#story">Our name</a><a href="#invest">Investors</a>
+    </nav>
+    <div class="foot-contact">
+      <a href="mailto:natashaik@icloud.com">natashaik@icloud.com</a>
+      <a href="tel:+14156088050">(415) 608-8050</a>
+    </div>
+  </div>
+  <div class="container foot-legal">© <span data-year>2026</span> genny · Please enjoy responsibly · Investor materials confidential</div>
+</footer>
+
+<!-- ============ INVESTOR DECK MODAL ============ -->
+<div class="modal-overlay" data-modal>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deck-title">
+    <button class="modal-close" data-close aria-label="Close">×</button>
+    <h3 id="deck-title">Request the investor deck</h3>
+    <p class="modal-sub">A few details and we'll send the full deck — financials, projections, and SAFE
+      terms — your way.</p>
+    <form class="js-form" data-subject="Investor deck request — genny" data-mailto="natashaik@icloud.com" novalidate>
+      <div class="form-fields">
+        <label for="d-name">Name</label>
+        <input id="d-name" name="name" data-label="Name" type="text" placeholder="Your name" required />
+        <label for="d-email">Email</label>
+        <input id="d-email" name="email" data-label="Email" type="email" placeholder="you@email.com" required />
+        <label for="d-firm">Firm / fund <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
+        <input id="d-firm" name="firm" data-label="Firm" type="text" placeholder="Where you invest from" />
+        <label for="d-note">Note <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea id="d-note" name="note" data-label="Note" rows="3" placeholder="What you'd like to know"></textarea>
+        <button type="submit" class="btn-fill btn-coral-fill btn-full">Send request</button>
+        <p class="confidential-note">🔒 These materials are confidential and shared at the founder's discretion.</p>
+      </div>
+      <div class="form-success" role="status">✓ Thank you — your request is on its way. We'll be in touch shortly.</div>
+    </form>
+  </div>
+</div>
+
+<script src="../assets/shared.js"></script>
+</body>
+</html>

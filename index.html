@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>genny · Website Prototypes</title>
+<meta name="description" content="Three website directions for genny Spritz — pick a direction." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%238C857A'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' fill='white' text-anchor='middle'%3Eg%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700&family=Playfair+Display:wght@400;500;600&family=Jost:wght@300;400;500;600&family=Lato:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/brand.css" />
+<style>
+  body { background: var(--linen);
+    background-image: radial-gradient(circle at 80% -5%, rgba(216,225,212,.6), transparent 45%); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 26px; }
+  .top { text-align: center; padding: 70px 0 12px; }
+  .top .mark { font-family: var(--font-display); font-weight: 600; font-size: 3.6rem; color: var(--ink); line-height: 1; }
+  .top .tag { font-family: var(--font-label); text-transform: uppercase; letter-spacing: .4em;
+    font-size: .82rem; color: var(--taupe); margin: 8px 0 0; }
+  .intro { text-align: center; max-width: 620px; margin: 36px auto 10px; }
+  .intro .kick { font-family: var(--font-label); text-transform: uppercase; letter-spacing: .28em;
+    font-size: .72rem; color: var(--muted); }
+  .intro h1 { font-family: var(--font-head); font-weight: 500; font-size: clamp(1.9rem,4vw,2.7rem);
+    margin: .4em 0 .5em; color: var(--ink); }
+  .intro p { color: var(--muted); font-size: 1.06rem; }
+  .cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 26px; padding: 44px 0 20px; }
+  .card { display: flex; flex-direction: column; background: var(--cream); border: 1px solid var(--line);
+    border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit;
+    box-shadow: 0 20px 46px -34px rgba(70,66,55,.5); transition: transform .3s var(--ease), box-shadow .3s var(--ease); }
+  .card:hover { transform: translateY(-8px); box-shadow: 0 34px 60px -34px rgba(70,66,55,.6); }
+  .thumb { aspect-ratio: 16/11; overflow: hidden; background: var(--sage-soft); border-bottom: 1px solid var(--line); }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .card-body { padding: 24px 24px 26px; display: flex; flex-direction: column; flex: 1; }
+  .card .num { font-family: var(--font-label); font-size: .74rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--coral); font-weight: 600; }
+  .card h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.5rem; margin: 6px 0 .4em; }
+  .card p { color: var(--muted); font-size: .95rem; margin: 0 0 18px; }
+  .card .mood { display: inline-flex; gap: 7px; margin-bottom: 18px; }
+  .card .mood span { width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(0,0,0,.06); }
+  .card .open { margin-top: auto; font-family: var(--font-label); font-weight: 600; font-size: .86rem;
+    color: var(--forest); letter-spacing: .04em; }
+  .card .open::after { content: " →"; }
+  .note { background: var(--cream); border: 1px solid var(--line); border-radius: 14px;
+    padding: 34px 36px; margin: 24px 0 0; display: grid; grid-template-columns: 1.3fr 1fr; gap: 30px; }
+  .note h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; margin: 0 0 12px; }
+  .note ul { margin: 0; padding-left: 18px; color: var(--muted); }
+  .note li { margin-bottom: 7px; }
+  .note .meta { border-left: 1px solid var(--line); padding-left: 30px; }
+  .note .meta p { color: var(--muted); font-size: .92rem; }
+  .foot { text-align: center; padding: 50px 0 60px; color: var(--muted); font-size: .85rem; }
+  .foot a { color: var(--forest); }
+  @media (max-width: 860px) { .cards { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
+    .note { grid-template-columns: 1fr; } .note .meta { border-left: 0; padding-left: 0;
+    border-top: 1px solid var(--line); padding-top: 20px; } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="mark">genny</div>
+      <p class="tag">Spritz, Elevated</p>
+    </div>
+
+    <div class="intro">
+      <p class="kick">Website prototypes</p>
+      <h1>Three directions to choose from.</h1>
+      <p>Each is a complete website that both promotes genny and invites investors — they differ in
+        emphasis and feel. Open each, then pick the direction that feels most like genny (or mix the
+        bits you love from each).</p>
+    </div>
+
+    <div class="cards">
+      <a class="card" href="variant-1-editorial/">
+        <div class="thumb"><img src="assets/thumb-v1.jpg" alt="Preview of the Elevated Editorial design" /></div>
+        <div class="card-body">
+          <span class="num">Direction 01</span>
+          <h2>Elevated Editorial</h2>
+          <p>Soft, premium and story-led — mirrors the pitch deck. Brand and the name story lead, with an
+            elegant investor section woven in.</p>
+          <span class="mood"><span style="background:var(--linen)"></span><span style="background:var(--sage)"></span><span style="background:var(--forest)"></span><span style="background:var(--coral)"></span></span>
+          <span class="open">Open this direction</span>
+        </div>
+      </a>
+      <a class="card" href="variant-2-modern/">
+        <div class="thumb"><img src="assets/thumb-v2.jpg" alt="Preview of the Clean Modern DTC design" /></div>
+        <div class="card-body">
+          <span class="num">Direction 02</span>
+          <h2>Clean Modern DTC</h2>
+          <p>Bright, product-forward and contemporary — mirrors the can design. Consumer energy up front,
+            with a clean investor band.</p>
+          <span class="mood"><span style="background:#fff"></span><span style="background:var(--cucumber)"></span><span style="background:var(--honeysuckle)"></span><span style="background:var(--rhubarb)"></span></span>
+          <span class="open">Open this direction</span>
+        </div>
+      </a>
+      <a class="card" href="variant-3-investor/">
+        <div class="thumb"><img src="assets/thumb-v3.jpg" alt="Preview of the Investor-Forward design" /></div>
+        <div class="card-body">
+          <span class="num">Direction 03</span>
+          <h2>Investor-Forward</h2>
+          <p>Structured and data-confident — mirrors the 1-pager. Built to raise, with the brand and
+            product in support.</p>
+          <span class="mood"><span style="background:var(--linen-deep)"></span><span style="background:var(--taupe)"></span><span style="background:var(--forest)"></span><span style="background:var(--coral)"></span></span>
+          <span class="open">Open this direction</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="note">
+      <div>
+        <h3>What's in every direction</h3>
+        <ul>
+          <li>The story behind the name (Genny / Genevieve)</li>
+          <li>The three launch flavors + the future flavor roadmap</li>
+          <li>Why-now market story and founder credibility</li>
+          <li>The $500K raise, use-of-capital, and roadmap to launch</li>
+          <li>Launch-list email capture for the Jan 2027 launch</li>
+        </ul>
+      </div>
+      <div class="meta">
+        <h3>Good to know</h3>
+        <p>Confidential financials are <strong>gated</strong> — the public pages tease the headline
+          numbers and put the full deck behind a “Request the deck” form. These are static prototypes:
+          forms open your email client and store nothing. Everything is ready to host on Netlify or
+          GitHub Pages.</p>
+      </div>
+    </div>
+
+    <div class="foot">
+      Built from genny's 1-pager &amp; pitch deck · <a href="mailto:natashaik@icloud.com">natashaik@icloud.com</a>
+    </div>
+  </div>
+</body>
+</html>

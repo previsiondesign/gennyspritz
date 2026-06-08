@@ -1,0 +1,150 @@
+/* ============================================================
+   GENNY Spritz — shared brand system
+   Design tokens, resets, and shared interactive components.
+   Each variant adds its own style.css on top of this.
+   Palette + type derived from the pitch deck & investor 1-pager.
+   ============================================================ */
+
+:root {
+  /* --- core palette --- */
+  --linen:       #EFE8DA;
+  --linen-deep:  #E6DCC9;
+  --cream:       #FBF8F2;
+  --paper:       #FFFFFF;
+
+  --taupe:       #8C857A;   /* the logo band */
+  --taupe-light: #B6AFA4;
+
+  --sage:        #D8E1D4;   /* soft highlight blocks */
+  --sage-soft:   #E8EDE4;
+  --sage-deep:   #A9BBA0;   /* mid sage accent */
+  --sage-line:   #C4D2BE;
+
+  --forest:      #2C4233;   /* the "genny =" mark */
+  --forest-soft: #3E5A45;
+
+  --coral:       #DB6A4F;   /* the raise + key numbers */
+  --coral-deep:  #C9543B;
+
+  /* flavor accents */
+  --rhubarb:     #CE4438;
+  --cucumber:    #7FA63F;
+  --honeysuckle: #DDB73A;
+
+  --ink:         #33322E;
+  --muted:       #6E6A62;
+  --line:        #E3DCCE;
+
+  /* type */
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-head:    'Playfair Display', Georgia, serif;
+  --font-label:   'Jost', 'Century Gothic', 'Helvetica Neue', sans-serif;
+  --font-body:    'Lato', 'Helvetica Neue', Arial, sans-serif;
+
+  --maxw: 1180px;
+  --ease: cubic-bezier(.22,.61,.36,1);
+}
+
+/* --- reset --- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  line-height: 1.62;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+img, svg, picture { max-width: 100%; display: block; }
+a { color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+h1,h2,h3,h4,h5 { margin: 0; line-height: 1.12; font-weight: 600; }
+p { margin: 0 0 1em; }
+
+/* --- shared utilities --- */
+.container { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 26px; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+.wordmark { font-family: var(--font-display); font-weight: 600; letter-spacing: -.02em; }
+.eyebrow {
+  font-family: var(--font-label); text-transform: uppercase;
+  letter-spacing: .34em; font-size: .72rem; font-weight: 500; color: var(--muted);
+}
+
+/* scroll reveal */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+.reveal.in { opacity: 1; transform: none; }
+.reveal[data-delay="1"] { transition-delay: .08s; }
+.reveal[data-delay="2"] { transition-delay: .16s; }
+.reveal[data-delay="3"] { transition-delay: .24s; }
+.reveal[data-delay="4"] { transition-delay: .32s; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+}
+
+/* ============================================================
+   Shared: investor-deck request modal (gated content)
+   ============================================================ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(34,40,34,.5); backdrop-filter: blur(3px);
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+  opacity: 0; visibility: hidden; transition: opacity .3s ease, visibility .3s ease;
+}
+.modal-overlay.open { opacity: 1; visibility: visible; }
+.modal {
+  background: var(--cream); color: var(--ink); border-radius: 6px;
+  width: 100%; max-width: 480px; padding: 38px 38px 32px;
+  box-shadow: 0 30px 80px rgba(40,46,40,.35);
+  transform: translateY(16px) scale(.98); transition: transform .35s var(--ease);
+  max-height: 90vh; overflow-y: auto;
+}
+.modal-overlay.open .modal { transform: none; }
+.modal h3 { font-family: var(--font-head); font-size: 1.7rem; margin-bottom: .25rem; }
+.modal .modal-sub { color: var(--muted); font-size: .94rem; margin-bottom: 1.4rem; }
+.modal-close {
+  position: absolute; top: 18px; right: 22px; background: none; border: 0;
+  font-size: 1.6rem; line-height: 1; color: var(--muted);
+}
+.modal label { display: block; font-family: var(--font-label); font-size: .72rem;
+  text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin: 0 0 5px; }
+.modal input, .modal textarea {
+  width: 100%; padding: 11px 13px; margin-bottom: 15px; font-family: var(--font-body);
+  font-size: .95rem; color: var(--ink); background: var(--paper);
+  border: 1px solid var(--line); border-radius: 4px;
+}
+.modal input:focus, .modal textarea:focus { outline: 2px solid var(--sage-deep); outline-offset: 1px; }
+.modal .confidential-note {
+  font-size: .76rem; color: var(--muted); margin-top: 4px; line-height: 1.5;
+  display: flex; gap: 7px; align-items: flex-start;
+}
+
+/* shared button baseline (variants restyle) */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5em;
+  font-family: var(--font-label); font-weight: 500; letter-spacing: .04em;
+  text-decoration: none; border: 0; border-radius: 4px;
+  padding: 14px 26px; font-size: .86rem; transition: all .25s var(--ease);
+}
+.btn-primary { background: var(--forest); color: #fff; }
+.btn-primary:hover { background: var(--forest-soft); transform: translateY(-2px); }
+.btn-coral { background: var(--coral); color: #fff; }
+.btn-coral:hover { background: var(--coral-deep); transform: translateY(-2px); }
+.btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+.btn-ghost:hover { background: var(--ink); color: #fff; }
+.btn-full { width: 100%; }
+
+/* form success state (shared) */
+.form-success {
+  display: none; align-items: center; gap: 10px;
+  background: var(--sage-soft); border: 1px solid var(--sage-line);
+  color: var(--forest); padding: 14px 16px; border-radius: 5px;
+  font-size: .92rem; line-height: 1.45;
+}
+.js-form.ok .form-success { display: flex; }
+.js-form.ok .form-fields { display: none; }
