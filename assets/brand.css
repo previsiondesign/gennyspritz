@@ -266,12 +266,13 @@ p { margin: 0 0 1em; }
 .cm-pt h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; margin-bottom: 5px; }
 .cm-pt p { margin: 0; color: var(--muted); font-size: .92rem; }
 
-/* lifestyle feature photo (target consumer) */
-.cm-lifestyle { max-width: 660px; margin: 0 auto 44px; }
-.cm-lifestyle figure { margin: 0; border-radius: 18px; overflow: hidden;
-  box-shadow: 0 24px 50px -28px rgba(40,40,30,.5); }
-.cm-lifestyle img { display: block; width: 100%; height: auto; }
-@media (max-width: 680px) { .cm-lifestyle { max-width: 460px; } }
+/* lifestyle feature photos (target consumer) */
+.cm-lifestyle { display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+  max-width: 1000px; margin: 0 auto 44px; }
+.cm-lifestyle figure { margin: 0; border-radius: 16px; overflow: hidden;
+  box-shadow: 0 22px 46px -28px rgba(40,40,30,.5); }
+.cm-lifestyle img { display: block; width: 100%; height: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+@media (max-width: 680px) { .cm-lifestyle { grid-template-columns: 1fr; max-width: 460px; } }
 
 /* the intersection (flavor/format/function/finance) */
 .cm-quad { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; }
