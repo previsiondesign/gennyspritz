@@ -80,8 +80,8 @@ section { scroll-margin-top: 84px; }
   transition: transform .35s var(--ease), box-shadow .35s var(--ease);
   box-shadow: 0 20px 44px -30px rgba(40,50,40,.5); }
 .tile:hover { transform: translateY(-8px); box-shadow: 0 34px 60px -34px rgba(40,50,40,.6); }
-.tile-can { height: 300px; display: flex; align-items: flex-end; justify-content: center; padding-top: 30px; }
-.tile-can img { height: 270px; width: auto; filter: drop-shadow(0 18px 18px rgba(40,50,40,.22)); }
+.tile-can { height: 320px; display: flex; align-items: center; justify-content: center; padding: 26px 0 44px; }
+.tile-can img { height: 250px; width: auto; filter: drop-shadow(0 24px 22px rgba(40,50,40,.28)); }
 .tile-body { background: #fff; padding: 26px 26px 30px; }
 .tile-tag { font-family: var(--font-label); font-weight: 600; text-transform: uppercase; letter-spacing: .1em;
   font-size: .72rem; color: var(--tile-accent); }
