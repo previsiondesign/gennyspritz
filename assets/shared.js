@@ -38,6 +38,12 @@
     nav.querySelectorAll('a').forEach(function (a) {
       a.addEventListener('click', closeNav);
     });
+    // test/screenshot hook: ?navopen opens the menu in the scrolled state
+    if (/[?&]navopen/.test(location.search)) {
+      nav.classList.add('open');
+      document.body.classList.add('nav-open');
+      if (header) header.classList.add('scrolled');
+    }
   }
 
   /* ---- scroll reveal ---- */
