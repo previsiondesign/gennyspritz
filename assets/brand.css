@@ -180,6 +180,12 @@ body.nav-open .back-directions { display: none; }
    Hidden on desktop; each variant reveals it inside the open
    panel at its mobile breakpoint and hides the desktop links.
    ============================================================ */
+/* backdrop scrim — tap outside the panel to close (mobile only) */
+.nav-scrim { position: fixed; inset: 0; z-index: 190; background: rgba(26,32,26,.42);
+  opacity: 0; visibility: hidden; transition: opacity .35s ease, visibility .35s ease; }
+body.nav-open .nav-scrim { opacity: 1; visibility: visible; }
+@media (min-width: 961px) { .nav-scrim { display: none; } }
+
 .nav-m { display: none; }
 .nav-m .nav-toplink { display: block; padding: 12px 0; font-family: var(--font-label);
   font-weight: 600; font-size: 1.02rem; color: var(--ink); text-decoration: none;

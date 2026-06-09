@@ -38,6 +38,15 @@
     nav.querySelectorAll('a').forEach(function (a) {
       a.addEventListener('click', closeNav);
     });
+    // backdrop scrim: tap outside the panel (or press Esc) to close.
+    // Appended inside the header so it shares the panel's stacking context.
+    var scrim = document.createElement('div');
+    scrim.className = 'nav-scrim';
+    (header || document.body).appendChild(scrim);
+    scrim.addEventListener('click', closeNav);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && nav.classList.contains('open')) closeNav();
+    });
     // test/screenshot hook: ?navopen opens the menu in the scrolled state
     if (/[?&]navopen/.test(location.search)) {
       nav.classList.add('open');
