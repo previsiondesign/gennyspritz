@@ -222,9 +222,11 @@ blockquote .q { font-family: var(--font-head); color: var(--sage-deep); font-siz
    Responsive
    ============================================================ */
 @media (max-width: 900px) {
-  .nav-toggle { display: block; z-index: 110; }
+  .nav-toggle { display: block; z-index: 210; }
+  /* backdrop-filter on the header would trap the fixed menu inside it — drop it on mobile */
+  .site-header.scrolled { backdrop-filter: none; -webkit-backdrop-filter: none; background: var(--cream); box-shadow: 0 1px 0 var(--line); }
   .nav {
-    position: fixed; inset: 0 0 0 auto; width: min(80vw, 320px);
+    position: fixed; inset: 0 0 0 auto; z-index: 200; width: min(80vw, 320px);
     flex-direction: column; align-items: flex-start; justify-content: center; gap: 26px;
     background: var(--cream); padding: 40px; transform: translateX(100%);
     transition: transform .4s var(--ease); box-shadow: -20px 0 50px rgba(0,0,0,.15);
