@@ -407,6 +407,7 @@
               <h4>Financials are gated</h4>
               <p>Request access to view the full model — margins, unit economics, COGS, and 5-year projections.</p>
               <button class="btn btn-coral" data-open-deck>Request access</button>
+              <p class="fin-have-code">Already have a code? <a href="../investors/">View the financials →</a></p>
             </div>
           </div>
         </div>
@@ -488,10 +489,10 @@
 <div class="modal-overlay" data-modal>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deck-title">
     <button class="modal-close" data-close aria-label="Close">×</button>
-    <h3 id="deck-title">Request the investor deck</h3>
-    <p class="modal-sub">A few details and we'll send the full deck — financials, projections, and SAFE
-      terms — your way.</p>
-    <form class="js-form" data-subject="Investor deck request — genny" data-mailto="natashaik@icloud.com" novalidate>
+    <h3 id="deck-title">Request access</h3>
+    <p class="modal-sub">A few details and Natasha will email you a private access code for the full
+      financials — plus the deck, projections, and SAFE terms.</p>
+    <form class="js-form" data-api="request-access" data-subject="Investor deck request — genny" data-mailto="natashaik@icloud.com" novalidate>
       <div class="form-fields">
         <label for="d-name">Name</label>
         <input id="d-name" name="name" data-label="Name" type="text" placeholder="Your name" required />
@@ -504,11 +505,13 @@
         <button type="submit" class="btn btn-coral btn-full">Send request</button>
         <p class="confidential-note">🔒 These materials are confidential and shared at the founder's discretion.</p>
       </div>
-      <div class="form-success" role="status">✓ Thank you — your request is on its way. We'll be in touch shortly.</div>
+      <div class="form-success" role="status">✓ Thank you — your request is in. Natasha will email your
+        private access code shortly.</div>
     </form>
   </div>
 </div>
 
+<script src="../assets/api.js"></script>
 <script src="../assets/shared.js"></script>
 </body>
 </html>

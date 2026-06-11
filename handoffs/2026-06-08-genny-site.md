@@ -1,4 +1,18 @@
-# Handoff — genny Spritz site (session 2026-06-08)
+# Handoff — genny Spritz site (sessions 2026-06-08 → 06-11)
+
+> **2026-06-11 addendum — gated investor area (Supabase).** Built `/admin/` (founder dashboard) +
+> `/investors/` (code-gated financials) + `supabase/` backend (schema.sql, edge functions
+> request/financials/admin with shared _shared modules). Auth: investor = email+code per visit
+> (each success logs a view → instant revoke); admin = `x-admin-key` header vs `ADMIN_PASSCODE`
+> secret (delay + table-backed rate limit). Codes `GS-XXXX-XXXX`, stored plaintext BY DESIGN
+> (mailto resend). Financials = single jsonb row, dashboard-edited, defaults mirror the public
+> dummy figures. variant-1 modal now POSTs `kind:'access'` with mailto fallback; the FAKE client
+> unlock in shared.js was REMOVED. Test hooks: `?api=<base>` + localStorage `genny-api-base`
+> override; `_mock_api.js` + `_extract/seed.html` (gitignored) drive headless verification —
+> 15-step contract walk + all UI states PASSED against the mock. **NOT yet deployed**: needs
+> Adam's Supabase project (then: run schema.sql, `npx supabase functions deploy`, `secrets set
+> ADMIN_PASSCODE`, fill project URL into assets/api.js + .github/workflows/keepalive.yml).
+> Until then, both new pages show a graceful "not connected" card.
 
 Repo = this folder (`site/`), pushed to `previsiondesign/gennyspritz`, branch `main`.
 Live: https://previsiondesign.github.io/gennyspritz/ . Deploy = commit + push (Pages rebuilds ~1 min,

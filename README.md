@@ -30,11 +30,30 @@ Confidential financials are **teased only** (≈60.6% gross margin, $18.99 4-pac
 full financials, projections, and SAFE terms sit behind a **“Request the deck”** form — never exposed on
 the public page. The confidential pitch deck itself is intentionally **not** included in this repo.
 
+## Gated investor area + founder dashboard
+
+The repo includes a real gated flow backed by **Supabase** (Postgres + Edge Functions):
+
+- **`/investors/`** — investors sign in with their email + a unique `GS-XXXX-XXXX` code Natasha
+  emails them. Every visit re-validates server-side (and logs a view); revocation is instant.
+  Lost codes can be re-requested (lands in the dashboard).
+- **`/admin/`** — Natasha's dashboard (passcode-protected): see access requests, grant (generates a
+  code + opens a ready-to-send email draft), see per-investor view counts/timestamps, revoke or
+  re-issue codes, and **edit every financial figure** investors see, with a live preview.
+- The variant-1 "Request access" modal posts to the backend (with a mailto fallback if it's
+  unreachable). Until the backend is connected, both pages show a graceful "not connected" card.
+
+Backend bits live in `supabase/` (schema + functions). One-time setup: create a free Supabase
+project, run `supabase/schema.sql` in its SQL editor, deploy the functions
+(`npx supabase functions deploy`), set the `ADMIN_PASSCODE` secret, and put the project URL into
+`assets/api.js`. **No secrets or real figures ever live in this repo** — financials are entered via
+the dashboard and stored only in Postgres.
+
 ## Forms
 
-These are static prototypes — submitting opens the visitor's email client to `natashaik@icloud.com`.
-To capture real signups in production, wire each `<form class="js-form">` to **Netlify Forms**,
-**Formspree**, or **Mailchimp**.
+The launch-list forms are static prototypes — submitting opens the visitor's email client to
+`natashaik@icloud.com`. To capture real signups, wire them to **Formspree** or **Mailchimp**
+(the investor-access modal already posts to the Supabase backend).
 
 ## Structure
 

@@ -1,0 +1,52 @@
+/* ============================================================
+   Investor financials page — linen, calm, Option-1 aesthetic.
+   Financial visuals come from brand.css (.fin-*).
+   ============================================================ */
+body { background: var(--linen); min-height: 100vh; display: flex; flex-direction: column; }
+main { flex: 1; }
+.inv-wrap { width: 100%; max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+.inv-header { padding: 22px 0; border-bottom: 1px solid var(--line); background: var(--cream); }
+.inv-header-inner { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.inv-brand { font-size: 1.7rem; color: var(--ink); text-decoration: none; }
+
+.inv-card { background: var(--cream); border: 1px solid var(--line); border-radius: 12px;
+  max-width: 460px; margin: 60px auto; padding: 38px 38px 30px;
+  box-shadow: 0 24px 60px -38px rgba(70,66,55,.55); }
+.inv-card h1, .inv-greeting h1 { font-family: var(--font-head); font-weight: 500;
+  font-size: clamp(1.7rem, 4vw, 2.3rem); margin-bottom: .4em; }
+.inv-sub { color: var(--muted); font-size: .96rem; }
+
+.inv-card label { display: block; font-family: var(--font-label); font-size: .72rem;
+  text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin: 14px 0 5px; }
+.inv-card input { width: 100%; padding: 12px 14px; font-family: var(--font-body); font-size: 1rem;
+  color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 5px; }
+.inv-card input:focus { outline: 2px solid var(--sage-deep); outline-offset: 1px; }
+#li-code { font-family: var(--font-label); letter-spacing: .12em; text-transform: uppercase; }
+.inv-card .btn { margin-top: 18px; }
+.inv-error { color: var(--coral-deep); font-size: .9rem; margin: 10px 0 0; }
+.inv-ok { color: var(--forest); font-size: .92rem; background: var(--sage-soft);
+  border: 1px solid var(--sage-line); border-radius: 5px; padding: 11px 13px; margin-top: 12px; }
+.inv-foot { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line);
+  font-size: .88rem; color: var(--muted); }
+.inv-foot a, .inv-card p a, .inv-confidential a { color: var(--forest); }
+#reset-form { margin-top: 14px; }
+
+.inv-greeting { margin: 54px 0 26px; }
+#fin-meta { margin-top: .2em; }
+#fin-mount .fin-content { filter: none !important; pointer-events: auto; user-select: text; }
+
+.inv-confidential { margin: 34px 0 60px; background: var(--sage-soft); border: 1px solid var(--sage-line);
+  border-radius: 10px; padding: 20px 24px; font-size: .92rem; color: #45433d; }
+.inv-confidential p { margin: 0 0 8px; }
+.inv-confidential .inv-foot { border-top: 0; padding-top: 4px; margin-top: 4px; }
+
+.inv-footer { background: var(--ink); color: #cfccc4; padding: 26px 0; margin-top: auto; }
+.inv-footer .inv-wrap { display: flex; align-items: baseline; justify-content: space-between;
+  gap: 14px; flex-wrap: wrap; font-size: .82rem; }
+.inv-footer .wordmark { color: #fff; font-size: 1.3rem; }
+
+@media (max-width: 560px) {
+  .inv-card { margin: 34px auto; padding: 28px 22px 24px; }
+  .inv-greeting { margin-top: 36px; }
+}

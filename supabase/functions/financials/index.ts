@@ -1,0 +1,46 @@
+// Investor endpoint: email + code login. A successful call logs one
+// view and returns the financials — login-per-visit means revocation
+// is instant and every view is recorded.
+import { preflight, json } from '../_shared/cors.ts';
+import { db, delay } from '../_shared/db.ts';
+import { readJson, normEmail } from '../_shared/validate.ts';
+import { codesMatch } from '../_shared/codes.ts';
+import { DEFAULT_FINANCIALS } from '../_shared/defaults.ts';
+
+Deno.serve(async (req) => {
+  const pf = preflight(req);
+  if (pf) return pf;
+  if (req.method !== 'POST') return json(req, 405, { ok: false, reason: 'method' });
+
+  const body = await readJson(req);
+  const email = normEmail(body?.email);
+  const code = String(body?.code ?? '');
+  if (!email || !code) {
+    await delay();
+    return json(req, 401, { ok: false, reason: 'invalid' });
+  }
+
+  const supa = db();
+  const { data: inv } = await supa.from('investors')
+    .select('email,name,code,status').eq('email', email).maybeSingle();
+
+  if (!inv || !(await codesMatch(inv.code, code))) {
+    await delay();
+    return json(req, 401, { ok: false, reason: 'invalid' });
+  }
+  if (inv.status === 'revoked') {
+    return json(req, 403, { ok: false, reason: 'revoked' });
+  }
+
+  await supa.from('views').insert({ email });
+
+  const { data: fin } = await supa.from('financials')
+    .select('doc,updated_at').eq('id', 1).maybeSingle();
+
+  return json(req, 200, {
+    ok: true,
+    investor: { name: inv.name },
+    financials: fin?.doc ?? DEFAULT_FINANCIALS,
+    updatedAt: fin?.updated_at ?? null,
+  });
+});

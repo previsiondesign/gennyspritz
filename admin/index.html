@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>genny · Founder Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23DB6A4F'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' fill='white' text-anchor='middle'%3Eg%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700&family=Playfair+Display:wght@400;500;600&family=Jost:wght@300;400;500;600&family=Lato:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/brand.css" />
+<link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+<header class="ad-header">
+  <div class="ad-wrap ad-header-inner">
+    <div>
+      <span class="wordmark ad-brand">genny</span>
+      <span class="eyebrow">Founder dashboard</span>
+    </div>
+    <div class="ad-header-actions">
+      <button class="ad-link" id="refresh" hidden>↻ Refresh</button>
+      <button class="ad-link" id="lock" hidden>Lock</button>
+    </div>
+  </div>
+</header>
+
+<main class="ad-wrap">
+
+  <!-- backend not connected -->
+  <section class="ad-card ad-narrow" id="not-configured" hidden>
+    <h1>Not connected yet</h1>
+    <p>The secure backend isn't set up on this copy of the site. (Adam: fill the project URL into
+      <code>assets/api.js</code>.)</p>
+  </section>
+
+  <!-- passcode gate -->
+  <section class="ad-card ad-narrow" id="gate" hidden>
+    <h1>Hi, Natasha.</h1>
+    <p class="ad-sub">Enter your dashboard passcode to continue.</p>
+    <form id="gate-form" novalidate>
+      <input id="gate-pass" type="password" autocomplete="current-password" placeholder="Passcode" required />
+      <p class="inv-error" id="gate-error" hidden></p>
+      <button type="submit" class="btn btn-coral btn-full" id="gate-btn">Open dashboard</button>
+    </form>
+  </section>
+
+  <!-- dashboard -->
+  <div id="dash" hidden>
+
+    <nav class="ad-tabs" aria-label="Dashboard sections">
+      <a href="#requests">Requests <span class="ad-badge" id="badge-requests" hidden></span></a>
+      <a href="#investors-sec">Investors</a>
+      <a href="#financials-sec">Financials</a>
+    </nav>
+
+    <section id="requests" class="ad-section">
+      <h2>Access requests</h2>
+      <p class="ad-sub">People who asked to see the financials. <strong>Grant</strong> creates their
+        access code and opens a ready-to-send email in your mail app.</p>
+      <div id="requests-list"></div>
+    </section>
+
+    <section id="investors-sec" class="ad-section">
+      <h2>Investors</h2>
+      <p class="ad-sub">Everyone with a code. Revoking blocks them instantly; you can re-grant later
+        (they'll get a fresh code).</p>
+      <div id="investors-list"></div>
+      <details class="ad-add">
+        <summary>＋ Add an investor manually</summary>
+        <form id="add-form" class="ad-add-form" novalidate>
+          <input id="add-name" type="text" placeholder="Name" required />
+          <input id="add-email" type="email" placeholder="email@firm.com" required />
+          <input id="add-firm" type="text" placeholder="Firm (optional)" />
+          <button type="submit" class="btn btn-primary">Grant access</button>
+        </form>
+        <p class="inv-error" id="add-error" hidden></p>
+      </details>
+    </section>
+
+    <section id="financials-sec" class="ad-section">
+      <h2>Financials</h2>
+      <p class="ad-sub">These numbers are what investors see, live. <span id="fin-status"
+        class="ad-pill warn" hidden>placeholder figures — not saved yet</span></p>
+      <form id="fin-form"></form>
+      <div class="ad-fin-actions">
+        <button class="btn btn-coral" id="fin-save">Save &amp; publish</button>
+        <span id="fin-saved" class="ad-saved" hidden>✓ Saved — investors now see these figures</span>
+        <p class="inv-error" id="fin-error" hidden></p>
+      </div>
+      <h3 class="ad-preview-h">Live preview (what investors see)</h3>
+      <div id="fin-preview" class="ad-preview"></div>
+    </section>
+
+  </div>
+</main>
+
+<script src="../assets/api.js"></script>
+<script src="../assets/financials-render.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

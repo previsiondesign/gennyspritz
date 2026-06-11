@@ -6,3 +6,10 @@ desktop.ini
 # build scratch (never committed)
 _extract/
 *.tmp
+
+# backend dev artifacts / secrets
+node_modules/
+.env
+.env.*
+supabase/.temp/
+.netlify/

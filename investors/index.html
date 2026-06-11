@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>genny · Investor Financials</title>
+<meta name="description" content="Private investor financials for genny — access by invitation." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232C4233'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' fill='white' text-anchor='middle'%3Eg%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700&family=Playfair+Display:wght@400;500;600&family=Jost:wght@300;400;500;600&family=Lato:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/brand.css" />
+<link rel="stylesheet" href="investors.css" />
+</head>
+<body>
+
+<header class="inv-header">
+  <div class="inv-wrap inv-header-inner">
+    <a href="../variant-1-editorial/" class="wordmark inv-brand">genny</a>
+    <span class="eyebrow">Investor financials · Confidential</span>
+  </div>
+</header>
+
+<main class="inv-wrap">
+
+  <!-- backend not connected (placeholder until deploy) -->
+  <section class="inv-card" id="not-configured" hidden>
+    <h1>Almost ready</h1>
+    <p>The secure investor area isn't connected yet. Please check back soon, or contact
+      <a href="mailto:natashaik@icloud.com">natashaik@icloud.com</a>.</p>
+  </section>
+
+  <!-- login -->
+  <section class="inv-card" id="login" hidden>
+    <h1>Welcome.</h1>
+    <p class="inv-sub">Enter the email your access code was sent to, and the code itself
+      (it looks like <strong>GS-XXXX-XXXX</strong>).</p>
+    <form id="login-form" novalidate>
+      <label for="li-email">Email</label>
+      <input id="li-email" type="email" autocomplete="email" placeholder="you@email.com" required />
+      <label for="li-code">Access code</label>
+      <input id="li-code" type="text" autocomplete="one-time-code" placeholder="GS-XXXX-XXXX"
+             spellcheck="false" autocapitalize="characters" required />
+      <p class="inv-error" id="login-error" hidden></p>
+      <button type="submit" class="btn btn-primary btn-full" id="login-btn">View the financials</button>
+    </form>
+    <p class="inv-foot">Lost your code? <a href="#" id="show-reset">Request a new one</a> ·
+      No access yet? <a href="../variant-1-editorial/#invest">Request it here</a></p>
+    <form id="reset-form" hidden novalidate>
+      <label for="rs-email">Your email</label>
+      <input id="rs-email" type="email" placeholder="you@email.com" required />
+      <p class="inv-error" id="reset-error" hidden></p>
+      <button type="submit" class="btn btn-ghost btn-full">Request a new code</button>
+      <p class="inv-ok" id="reset-ok" hidden>✓ Thanks — if this email has access, Natasha will send a
+        fresh code shortly.</p>
+    </form>
+  </section>
+
+  <!-- revoked -->
+  <section class="inv-card" id="revoked" hidden>
+    <h1>Access has been closed.</h1>
+    <p>This access code is no longer active. If you think that's a mistake — or you'd like to pick
+      the conversation back up — Natasha would love to hear from you:
+      <a href="mailto:natashaik@icloud.com">natashaik@icloud.com</a>.</p>
+    <p class="inv-foot"><a href="#" id="revoked-retry">Sign in with a different code</a></p>
+  </section>
+
+  <!-- financials -->
+  <section id="financials-view" hidden>
+    <div class="inv-greeting">
+      <p class="eyebrow">Private &amp; confidential</p>
+      <h1 id="greeting">The financials.</h1>
+      <p class="inv-sub" id="fin-meta"></p>
+    </div>
+    <div id="fin-mount"></div>
+    <div class="inv-confidential">
+      <p>🔒 Shared with you personally for evaluating an investment in genny — please don't forward
+        or redistribute. Full model, projections, and SAFE terms are available from Natasha:
+        <a href="mailto:natashaik@icloud.com">natashaik@icloud.com</a> · (415) 608-8050.</p>
+      <p class="inv-foot"><a href="#" id="logout">Sign out on this device</a></p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="inv-footer">
+  <div class="inv-wrap">
+    <span class="wordmark">genny</span>
+    <span>Spritz, Elevated · © <span data-year>2026</span> · Confidential</span>
+  </div>
+</footer>
+
+<script src="../assets/api.js"></script>
+<script src="../assets/financials-render.js"></script>
+<script src="investors.js"></script>
+</body>
+</html>

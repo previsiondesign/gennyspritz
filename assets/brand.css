@@ -226,6 +226,8 @@ body.nav-open .nav-scrim { opacity: 1; visibility: visible; }
 .fin-lock-card .lock-ico svg { width: 24px; height: 24px; color: var(--forest); }
 .fin-lock-card h4 { font-family: var(--font-display); font-weight: 600; font-size: 1.35rem; margin: .4em 0 .35em; }
 .fin-lock-card p { color: var(--muted); font-size: .95rem; margin-bottom: 1.2em; line-height: 1.5; }
+.fin-lock-card .fin-have-code { font-size: .84rem; margin: 14px 0 0; }
+.fin-lock-card .fin-have-code a { color: var(--forest); font-weight: 700; }
 
 /* financial content primitives */
 .fin-years { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; margin-bottom: 16px; }

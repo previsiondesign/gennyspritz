@@ -122,16 +122,30 @@
       var body = lines.join('\n') + '\n\n— sent from the genny website';
       var href = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) +
                  '&body=' + encodeURIComponent(body);
-      // show success state
-      form.classList.add('ok');
-      // an investor-deck request unlocks the gated financials on the page
-      if (/deck|financ|invest/i.test(subject)) {
-        document.querySelectorAll('[data-financials]').forEach(function (f) {
-          f.classList.add('unlocked');
+      var mailtoFallback = function () {
+        form.classList.add('ok');
+        try { window.location.href = href; } catch (err) { /* no-op */ }
+      };
+
+      // Access requests go to the secure backend (lands in Natasha's
+      // dashboard); mailto only if the API is missing or unreachable.
+      if (form.getAttribute('data-api') === 'request-access' &&
+          window.GennyAPI && window.GennyAPI.configured) {
+        var val = function (n) {
+          var f = form.querySelector('[name="' + n + '"]');
+          return f ? f.value.trim() : '';
+        };
+        window.GennyAPI.call('/request', {
+          method: 'POST',
+          body: { kind: 'access', name: val('name'), email: val('email'),
+                  firm: val('firm'), note: val('note') },
+        }).then(function (res) {
+          if (res.status === 200 && res.data && res.data.ok) form.classList.add('ok');
+          else mailtoFallback();
         });
+        return;
       }
-      // open the user's mail client (prototype has no backend)
-      try { window.location.href = href; } catch (err) { /* no-op */ }
+      mailtoFallback();
     });
   });
 })();
