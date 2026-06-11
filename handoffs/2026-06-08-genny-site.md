@@ -9,10 +9,13 @@
 > dummy figures. variant-1 modal now POSTs `kind:'access'` with mailto fallback; the FAKE client
 > unlock in shared.js was REMOVED. Test hooks: `?api=<base>` + localStorage `genny-api-base`
 > override; `_mock_api.js` + `_extract/seed.html` (gitignored) drive headless verification —
-> 15-step contract walk + all UI states PASSED against the mock. **NOT yet deployed**: needs
-> Adam's Supabase project (then: run schema.sql, `npx supabase functions deploy`, `secrets set
-> ADMIN_PASSCODE`, fill project URL into assets/api.js + .github/workflows/keepalive.yml).
-> Until then, both new pages show a graceful "not connected" card.
+> 15-step contract walk + all UI states PASSED against the mock. **DEPLOYED + LIVE 2026-06-11**:
+> Supabase project "Genny Backend" ref `rhblnawzobuxcaroyfmc` (Adam's account); functions deployed,
+> ADMIN_PASSCODE secret set, api.js + keepalive.yml carry the real URL, 15-step walk re-run live
+> (ALL PASS), CORS proven for the github.io origin, test rows purged (financials row deleted so the
+> dashboard shows "not saved yet" until Natasha saves real figures). Redeploy functions with:
+> `SUPABASE_ACCESS_TOKEN=<token> npx supabase functions deploy --project-ref rhblnawzobuxcaroyfmc`
+> from `site/`. Raw SQL without DB password: Management API POST /v1/projects/{ref}/database/query.
 
 Repo = this folder (`site/`), pushed to `previsiondesign/gennyspritz`, branch `main`.
 Live: https://previsiondesign.github.io/gennyspritz/ . Deploy = commit + push (Pages rebuilds ~1 min,
