@@ -105,6 +105,17 @@ body { background: var(--linen); }
 .ad-preview { background: var(--forest); border-radius: 12px; padding: 26px; }
 .ad-preview .fin-content { filter: none !important; pointer-events: auto; }
 
+/* settings */
+.ad-settings { max-width: 440px; padding: 26px 28px; }
+.ad-settings-h { font-family: var(--font-label); text-transform: uppercase; letter-spacing: .1em;
+  font-size: .74rem; color: var(--muted); margin-bottom: 14px; }
+.ad-settings label { display: block; font-family: var(--font-label); font-size: .72rem;
+  text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin: 12px 0 5px; }
+.ad-settings input { width: 100%; padding: 10px 12px; border: 1px solid var(--line);
+  border-radius: 5px; background: #fff; font-family: var(--font-body); font-size: .95rem; }
+.ad-settings input:focus { outline: 2px solid var(--sage-deep); }
+.ad-settings .btn { margin-top: 16px; }
+
 @media (max-width: 760px) {
   #fin-form { grid-template-columns: 1fr; }
   .ad-row { grid-template-columns: 1fr; }

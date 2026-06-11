@@ -14,6 +14,11 @@ export function normalizeCode(raw: string): string {
   return (raw || '').toUpperCase().replace(/[\s-]/g, '');
 }
 
+export async function sha256Hex(s: string): Promise<string> {
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(d)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 // Compare via SHA-256 digests so the comparison itself can't leak
 // positional information about the stored code.
 export async function codesMatch(stored: string, given: string): Promise<boolean> {

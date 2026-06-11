@@ -22,7 +22,7 @@
     </div>
     <div class="ad-header-actions">
       <button class="ad-link" id="refresh" hidden>↻ Refresh</button>
-      <button class="ad-link" id="lock" hidden>Lock</button>
+      <button class="ad-link" id="lock" hidden>Log out</button>
     </div>
   </div>
 </header>
@@ -54,6 +54,7 @@
       <a href="#requests">Requests <span class="ad-badge" id="badge-requests" hidden></span></a>
       <a href="#investors-sec">Investors</a>
       <a href="#financials-sec">Financials</a>
+      <a href="#settings-sec">Settings</a>
     </nav>
 
     <section id="requests" class="ad-section">
@@ -92,6 +93,26 @@
       </div>
       <h3 class="ad-preview-h">Live preview (what investors see)</h3>
       <div id="fin-preview" class="ad-preview"></div>
+    </section>
+
+    <section id="settings-sec" class="ad-section">
+      <h2>Settings</h2>
+      <p class="ad-sub">You're signed out automatically after 10 minutes of inactivity, or when this
+        tab closes.</p>
+      <div class="ad-card ad-settings">
+        <h3 class="ad-settings-h">Change your passcode</h3>
+        <form id="pass-form" novalidate>
+          <label for="pc-current">Current passcode</label>
+          <input id="pc-current" type="password" autocomplete="current-password" required />
+          <label for="pc-next">New passcode <span class="fe-unit">(at least 8 characters)</span></label>
+          <input id="pc-next" type="password" autocomplete="new-password" required />
+          <label for="pc-confirm">Repeat new passcode</label>
+          <input id="pc-confirm" type="password" autocomplete="new-password" required />
+          <p class="inv-error" id="pass-error" hidden></p>
+          <p class="ad-saved" id="pass-ok" hidden>✓ Passcode updated — use the new one from now on.</p>
+          <button type="submit" class="btn btn-coral">Update passcode</button>
+        </form>
+      </div>
     </section>
 
   </div>

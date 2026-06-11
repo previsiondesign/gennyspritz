@@ -50,9 +50,19 @@ create table if not exists public.auth_failures (
 );
 create index if not exists auth_failures_ip_idx on public.auth_failures (ip, at desc);
 
+-- Dashboard passcode, stored as a SHA-256 hex hash. Changeable from the
+-- dashboard (admin/change-passcode); the ADMIN_PASSCODE env secret is only
+-- a bootstrap fallback used when this row doesn't exist yet.
+create table if not exists public.admin_settings (
+  id            int primary key default 1 check (id = 1),  -- single row
+  passcode_hash text not null,
+  updated_at    timestamptz not null default now()
+);
+
 -- Deny-all for anon/authenticated; Edge Functions use the service role (bypasses RLS).
-alter table public.requests      enable row level security;
-alter table public.investors     enable row level security;
-alter table public.views         enable row level security;
-alter table public.financials    enable row level security;
-alter table public.auth_failures enable row level security;
+alter table public.requests       enable row level security;
+alter table public.investors      enable row level security;
+alter table public.views          enable row level security;
+alter table public.financials     enable row level security;
+alter table public.auth_failures  enable row level security;
+alter table public.admin_settings enable row level security;

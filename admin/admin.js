@@ -7,7 +7,16 @@
   var $ = function (id) { return document.getElementById(id); };
   var KEY_STORE = 'genny-admin-key';
   var SITE_BASE = 'https://previsiondesign.github.io/gennyspritz';
+  var IDLE_MS = 10 * 60 * 1000;   // auto sign-out after 10 min of inactivity
   var state = { key: null, overview: null, finDoc: null };
+  var lastActivity = Date.now();
+
+  // Session lives in sessionStorage: it dies with the tab. (Clean up any
+  // key left behind by the earlier localStorage version.)
+  try { localStorage.removeItem(KEY_STORE); } catch (e) {}
+  function readKey() { try { return sessionStorage.getItem(KEY_STORE); } catch (e) { return null; } }
+  function writeKey(k) { try { sessionStorage.setItem(KEY_STORE, k); } catch (e) {} }
+  function dropKey() { try { sessionStorage.removeItem(KEY_STORE); } catch (e) {} }
 
   // ---------- tiny DOM helpers ----------
   function el(tag, cls, text) {
@@ -34,7 +43,12 @@
     opts = opts || {};
     opts.adminKey = state.key;
     return GennyAPI.call(path, opts).then(function (res) {
-      if (res.status === 401) { lock("That passcode didn't work — try again."); throw new Error('auth'); }
+      // 401 'bad-current' is the change-passcode form's inline error, not a
+      // dead session — only the gate rejection logs her out.
+      if (res.status === 401 && !(res.data && res.data.reason === 'bad-current')) {
+        lock('Your session ended — please sign in again.');
+        throw new Error('auth');
+      }
       if (res.status === 429) { lock('Too many failed attempts — wait 10 minutes and try again.'); throw new Error('locked'); }
       return res;
     });
@@ -43,19 +57,21 @@
   // ---------- gate ----------
   function lock(msg) {
     state.key = null;
-    try { localStorage.removeItem(KEY_STORE); } catch (e) {}
+    dropKey();
     $('dash').hidden = true; $('refresh').hidden = true; $('lock').hidden = true;
     $('gate').hidden = false;
+    $('gate-pass').value = '';
     if (msg) { $('gate-error').textContent = msg; $('gate-error').hidden = false; }
   }
 
   function unlock(key) {
     state.key = key;
+    lastActivity = Date.now();
     $('gate-btn').disabled = true; $('gate-btn').textContent = 'Checking…';
     GennyAPI.call('/admin/overview', { adminKey: key }).then(function (res) {
       $('gate-btn').disabled = false; $('gate-btn').textContent = 'Open dashboard';
       if (res.status === 200 && res.data && res.data.ok) {
-        try { localStorage.setItem(KEY_STORE, key); } catch (e) {}
+        writeKey(key);
         $('gate').hidden = true; $('dash').hidden = false;
         $('refresh').hidden = false; $('lock').hidden = false;
         state.overview = res.data;
@@ -405,6 +421,45 @@
   $('lock').addEventListener('click', function () { lock(); });
   $('refresh').addEventListener('click', function () { loadOverview(); loadFinancials(); });
 
+  // ---- idle auto sign-out (10 min) ----
+  ['pointerdown', 'keydown', 'wheel', 'touchstart', 'mousemove'].forEach(function (ev) {
+    document.addEventListener(ev, function () { lastActivity = Date.now(); }, { passive: true });
+  });
+  function idleCheck() {
+    if (state.key && Date.now() - lastActivity > IDLE_MS) {
+      lock('Signed out after 10 minutes of inactivity.');
+    }
+  }
+  setInterval(idleCheck, 30000);
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) idleCheck();   // catch up after the tab was backgrounded
+  });
+
+  // ---- change passcode ----
+  $('pass-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    $('pass-error').hidden = true; $('pass-ok').hidden = true;
+    var current = $('pc-current').value, next = $('pc-next').value, confirm2 = $('pc-confirm').value;
+    var fail = function (m) { $('pass-error').textContent = m; $('pass-error').hidden = false; };
+    if (!current || !next) return fail('Please fill in every field.');
+    if (next !== confirm2) return fail("The new passcodes don't match.");
+    if (next.length < 8) return fail('The new passcode needs at least 8 characters.');
+    if (next !== next.trim()) return fail("The new passcode can't start or end with a space.");
+    api('/admin/change-passcode', { method: 'POST', body: { current: current, next: next } })
+      .then(function (res) {
+        if (res.status === 200 && res.data.ok) {
+          state.key = next;
+          writeKey(next);
+          $('pc-current').value = ''; $('pc-next').value = ''; $('pc-confirm').value = '';
+          $('pass-ok').hidden = false;
+        } else if (res.data && res.data.reason === 'bad-current') {
+          fail("That current passcode didn't match.");
+        } else {
+          fail('Could not update the passcode — please try again.');
+        }
+      }).catch(function () {});
+  });
+
   $('add-form').addEventListener('submit', function (e) {
     e.preventDefault();
     $('add-error').hidden = true;
@@ -438,8 +493,7 @@
     }).catch(function () {});
   });
 
-  var savedKey = null;
-  try { savedKey = localStorage.getItem(KEY_STORE); } catch (e) {}
+  var savedKey = readKey();
   if (savedKey) unlock(savedKey);
   else { $('gate').hidden = false; }
 })();

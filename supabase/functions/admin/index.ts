@@ -4,17 +4,35 @@
 import { preflight, json } from '../_shared/cors.ts';
 import { db, clientIp, delay } from '../_shared/db.ts';
 import { readJson, normEmail, str, validFinancials } from '../_shared/validate.ts';
-import { generateCode, codesMatch } from '../_shared/codes.ts';
+import { generateCode, sha256Hex } from '../_shared/codes.ts';
 import { DEFAULT_FINANCIALS, buildCodeEmail } from '../_shared/defaults.ts';
 
 const FAIL_WINDOW_MIN = 10;
 const FAIL_LIMIT = 20;
 
+// Stored passcode hash: DB row wins (changeable from the dashboard);
+// the ADMIN_PASSCODE env secret is only a bootstrap fallback.
+async function storedPasscodeHash(supa: ReturnType<typeof db>): Promise<string | null> {
+  const { data } = await supa.from('admin_settings')
+    .select('passcode_hash').eq('id', 1).maybeSingle();
+  if (data?.passcode_hash) return data.passcode_hash;
+  const env = Deno.env.get('ADMIN_PASSCODE');
+  return env ? await sha256Hex(env) : null;
+}
+
+async function passcodeValid(supa: ReturnType<typeof db>, given: string): Promise<boolean> {
+  const stored = await storedPasscodeHash(supa);
+  if (!stored || !given) return false;
+  const givenHash = await sha256Hex(given);
+  let diff = 0;
+  for (let i = 0; i < stored.length; i++) diff |= stored.charCodeAt(i) ^ (givenHash.charCodeAt(i) ?? 0);
+  return diff === 0 && stored.length === givenHash.length;
+}
+
 async function requireAdmin(req: Request): Promise<Response | null> {
   const supa = db();
   const ip = clientIp(req);
   const given = req.headers.get('x-admin-key') ?? '';
-  const expected = Deno.env.get('ADMIN_PASSCODE') ?? '';
 
   // lockout check (best-effort, table-backed)
   const since = new Date(Date.now() - FAIL_WINDOW_MIN * 60_000).toISOString();
@@ -25,7 +43,7 @@ async function requireAdmin(req: Request): Promise<Response | null> {
     return json(req, 429, { ok: false, reason: 'locked' });
   }
 
-  if (!expected || !(await codesMatch(expected, given))) {
+  if (!(await passcodeValid(supa, given))) {
     await supa.from('auth_failures').insert({ ip });
     if (Math.random() < 0.1) {
       await supa.from('auth_failures').delete()
@@ -160,6 +178,24 @@ Deno.serve(async (req) => {
       ok: true, code,
       emailDraft: buildCodeEmail(inv.name, email, code),
     });
+  }
+
+  // ---------- change passcode ----------
+  if (action === 'change-passcode') {
+    const current = String(body.current ?? '');
+    const next = String(body.next ?? '');
+    if (!(await passcodeValid(supa, current))) {
+      await delay();
+      return json(req, 401, { ok: false, reason: 'bad-current' });
+    }
+    if (next.length < 8 || next.length > 72 || next !== next.trim()) {
+      return json(req, 400, { ok: false, reason: 'weak-passcode' });
+    }
+    const { error } = await supa.from('admin_settings').upsert({
+      id: 1, passcode_hash: await sha256Hex(next), updated_at: new Date().toISOString(),
+    });
+    if (error) return json(req, 500, { ok: false, reason: 'store' });
+    return json(req, 200, { ok: true });
   }
 
   // ---------- dismiss request ----------
