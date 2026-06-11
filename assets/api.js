@@ -8,8 +8,7 @@
 (function () {
   'use strict';
 
-  // Filled in at deploy: https://<project-ref>.supabase.co/functions/v1
-  var DEFAULT_BASE = 'https://YOUR-PROJECT-REF.supabase.co/functions/v1';
+  var DEFAULT_BASE = 'https://rhblnawzobuxcaroyfmc.supabase.co/functions/v1';
 
   var override = null;
   try {

@@ -12,8 +12,7 @@ jobs:
     steps:
       - name: Ping the genny API
         run: |
-          # Filled in at deploy time (same commit that sets assets/api.js)
-          URL="https://YOUR-PROJECT-REF.supabase.co/functions/v1/request"
+          URL="https://rhblnawzobuxcaroyfmc.supabase.co/functions/v1/request"
           if [[ "$URL" == *"YOUR-PROJECT-REF"* ]]; then
             echo "API not configured yet — skipping."
             exit 0
