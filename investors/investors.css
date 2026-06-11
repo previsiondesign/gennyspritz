@@ -32,6 +32,12 @@ main { flex: 1; }
 .inv-foot a, .inv-card p a, .inv-confidential a { color: var(--forest); }
 #reset-form { margin-top: 14px; }
 
+.inv-terms { max-width: 560px; }
+.inv-terms-list { margin: 18px 0 6px; padding-left: 22px; }
+.inv-terms-list li { margin-bottom: 12px; color: #45433d; font-size: .96rem; line-height: 1.55; }
+.inv-terms-note { font-size: .82rem; color: var(--muted); font-style: italic; margin: 14px 0 0; }
+.inv-terms-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+
 .inv-greeting { margin: 54px 0 26px; }
 #fin-meta { margin-top: .2em; }
 #fin-mount .fin-content { filter: none !important; pointer-events: auto; user-select: text; }

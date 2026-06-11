@@ -11,10 +11,13 @@
   });
 
   function show(id) {
-    ['not-configured', 'login', 'revoked', 'financials-view'].forEach(function (s) {
+    ['not-configured', 'login', 'terms', 'revoked', 'financials-view'].forEach(function (s) {
       $(s).hidden = (s !== id);
     });
   }
+
+  // creds awaiting terms acceptance (not remembered until agreed)
+  var pending = null;
 
   function creds() {
     try { return JSON.parse(localStorage.getItem(CRED_KEY) || 'null'); }
@@ -44,14 +47,20 @@
     show('financials-view');
   }
 
-  function attempt(email, code, fromStored) {
+  function attempt(email, code, fromStored, agree) {
     $('login-btn').disabled = true;
     $('login-btn').textContent = 'Checking…';
-    GennyAPI.call('/financials', { method: 'POST', body: { email: email, code: code } })
+    var body = { email: email, code: code };
+    if (agree) body.agree = true;
+    GennyAPI.call('/financials', { method: 'POST', body: body })
       .then(function (res) {
         $('login-btn').disabled = false;
         $('login-btn').textContent = 'View the financials';
-        if (res.status === 200 && res.data && res.data.ok) {
+        if (res.status === 200 && res.data && res.data.ok && res.data.needsAgreement) {
+          pending = { email: email, code: code };
+          show('terms');
+        } else if (res.status === 200 && res.data && res.data.ok) {
+          pending = null;
           saveCreds({ email: email, code: code });
           renderView(res.data);
         } else if (res.status === 403) {
@@ -103,6 +112,17 @@
         if (res.status === 200) { $('reset-ok').hidden = false; $('rs-email').value = ''; }
         else err('reset-error', "Couldn't send the request — please try again or email Natasha directly.");
       });
+  });
+
+  $('terms-agree').addEventListener('click', function () {
+    if (pending) attempt(pending.email, pending.code, false, true);
+  });
+
+  $('terms-exit').addEventListener('click', function () {
+    pending = null;
+    clearCreds();
+    $('li-code').value = '';
+    show('login');
   });
 
   $('logout').addEventListener('click', function (e) {

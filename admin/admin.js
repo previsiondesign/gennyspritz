@@ -197,6 +197,9 @@
     meta.appendChild(document.createTextNode(i.email + (i.firm ? ' · ' + i.firm : '') + ' · code '));
     meta.appendChild(copyable(i.code));
     meta.appendChild(document.createTextNode(' · granted ' + fmt(i.created_at)));
+    meta.appendChild(document.createTextNode(i.agreed_at
+      ? ' · terms accepted ' + fmt(i.agreed_at)
+      : ' · terms not yet accepted'));
     main.appendChild(meta);
 
     var views = el('div', 'ad-views');

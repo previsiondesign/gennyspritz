@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
 
   const supa = db();
   const { data: inv } = await supa.from('investors')
-    .select('email,name,code,status').eq('email', email).maybeSingle();
+    .select('email,name,code,status,agreed_at').eq('email', email).maybeSingle();
 
   if (!inv || !(await codesMatch(inv.code, code))) {
     await delay();
@@ -30,6 +30,16 @@ Deno.serve(async (req) => {
   }
   if (inv.status === 'revoked') {
     return json(req, 403, { ok: false, reason: 'revoked' });
+  }
+
+  // Terms of access: nothing is shown (or logged as a view) until the
+  // investor has accepted, once. Acceptance is recorded with a timestamp.
+  if (!inv.agreed_at) {
+    if (body?.agree !== true) {
+      return json(req, 200, { ok: true, needsAgreement: true, investor: { name: inv.name } });
+    }
+    await supa.from('investors')
+      .update({ agreed_at: new Date().toISOString() }).eq('email', email);
   }
 
   await supa.from('views').insert({ email });
