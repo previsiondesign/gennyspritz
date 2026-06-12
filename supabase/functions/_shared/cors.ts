@@ -1,5 +1,7 @@
 // CORS for the static site (GitHub Pages) + local development.
 const STATIC_ORIGINS = new Set([
+  'https://gennyspritz.com',
+  'https://www.gennyspritz.com',
   'https://previsiondesign.github.io',
 ]);
 const LOCAL_RE = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;

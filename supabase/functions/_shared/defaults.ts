@@ -3,7 +3,7 @@
 // already visible in the repo, so nothing confidential leaks — and
 // keep the "illustrative" caption so unsaved state can't masquerade
 // as real numbers.
-export const SITE_BASE = 'https://previsiondesign.github.io/gennyspritz';
+export const SITE_BASE = 'https://gennyspritz.com';
 
 export const DEFAULT_FINANCIALS = {
   caption: 'Illustrative placeholder figures — full model in the deck',

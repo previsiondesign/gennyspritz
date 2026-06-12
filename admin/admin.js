@@ -6,7 +6,7 @@
 
   var $ = function (id) { return document.getElementById(id); };
   var KEY_STORE = 'genny-admin-key';
-  var SITE_BASE = 'https://previsiondesign.github.io/gennyspritz';
+  var SITE_BASE = 'https://gennyspritz.com';
   var IDLE_MS = 10 * 60 * 1000;   // auto sign-out after 10 min of inactivity
   var state = { key: null, overview: null, finDoc: null };
   var lastActivity = Date.now();

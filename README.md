@@ -3,8 +3,8 @@
 Three website directions for **genny**, a wine-based RTD ("Spritz, Elevated") launching January 2027.
 Each is a complete, self-contained static site that both **promotes the brand** and **invites investors**.
 
-**Live:** once GitHub Pages is enabled, this repo serves at
-`https://previsiondesign.github.io/gennyspritz/`.
+**Live:** `https://gennyspritz.com` (gennyinc.com forwards here; the old
+`https://previsiondesign.github.io/gennyspritz/` URLs redirect automatically).
 
 ## The three directions
 
