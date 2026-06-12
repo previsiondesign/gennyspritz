@@ -257,7 +257,7 @@ Deno.serve(async (req) => {
       if (signed?.signedUrl) imageLine = `\nScreenshot (link valid 14 days):\n${signed.signedUrl}\n`;
     }
     const mail = await sendEmail({
-      to: 'adam@previsiondesign.com',
+      to: Deno.env.get('NOTIFY_BUGS_TO') ?? 'adam@previsiondesign.com',
       subject: `genny dashboard — bug/change request #${bug.id}`,
       text: `Natasha filed a bug / change request:\n\n${message}\n${imageLine}\nTrack it: ${Deno.env.get('SITE_BASE') ?? 'https://gennyspritz.com'}/admin/#bugs-sec`,
     });
@@ -281,7 +281,7 @@ Deno.serve(async (req) => {
     if (error) return json(req, 500, { ok: false, reason: 'store' });
     if (newStatus === 'reopened') {
       await sendEmail({
-        to: 'adam@previsiondesign.com',
+        to: Deno.env.get('NOTIFY_BUGS_TO') ?? 'adam@previsiondesign.com',
         subject: `genny dashboard — request #${id} NOT resolved`,
         text: `Natasha marked request #${id} as not resolved.\n\nOriginal:\n${bug.message}\n\nHer follow-up:\n${note || '(no detail given)'}`,
       });

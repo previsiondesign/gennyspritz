@@ -6,7 +6,7 @@ import { readJson, normEmail, str } from '../_shared/validate.ts';
 import { sendEmail } from '../_shared/email.ts';
 import { SITE_BASE } from '../_shared/defaults.ts';
 
-const NOTIFY_TO = 'investor-request@gennyspritz.com';
+const NOTIFY_TO = Deno.env.get('NOTIFY_REQUESTS_TO') ?? 'investor-request@gennyspritz.com';
 
 Deno.serve(async (req) => {
   const pf = preflight(req);
