@@ -4,132 +4,509 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="robots" content="noindex, nofollow" />
-<title>genny · Website Prototypes</title>
-<meta name="description" content="Three website directions for genny Spritz — pick a direction." />
+<title>genny · Spritz, Elevated</title>
+<meta name="description" content="genny is the wine drinker's spritz — a crafted, low-alcohol wine spritz with real bubbles, no sugar added, and beautifully unexpected flavors. Launching January 2027." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%238C857A'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' fill='white' text-anchor='middle'%3Eg%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700&family=Playfair+Display:wght@400;500;600&family=Jost:wght@300;400;500;600&family=Lato:wght@400;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="assets/brand.css" />
-<style>
-  body { background: var(--linen);
-    background-image: radial-gradient(circle at 80% -5%, rgba(216,225,212,.6), transparent 45%); }
-  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 26px; }
-  .top { text-align: center; padding: 70px 0 12px; }
-  .top .mark { font-family: var(--font-display); font-weight: 600; font-size: 3.6rem; color: var(--ink); line-height: 1; }
-  .top .tag { font-family: var(--font-label); text-transform: uppercase; letter-spacing: .4em;
-    font-size: .82rem; color: var(--taupe); margin: 8px 0 0; }
-  .intro { text-align: center; max-width: 620px; margin: 36px auto 10px; }
-  .intro .kick { font-family: var(--font-label); text-transform: uppercase; letter-spacing: .28em;
-    font-size: .72rem; color: var(--muted); }
-  .intro h1 { font-family: var(--font-head); font-weight: 500; font-size: clamp(1.9rem,4vw,2.7rem);
-    margin: .4em 0 .5em; color: var(--ink); }
-  .intro p { color: var(--muted); font-size: 1.06rem; }
-  .cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 26px; padding: 44px 0 20px; }
-  .card { display: flex; flex-direction: column; background: var(--cream); border: 1px solid var(--line);
-    border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit;
-    box-shadow: 0 20px 46px -34px rgba(70,66,55,.5); transition: transform .3s var(--ease), box-shadow .3s var(--ease); }
-  .card:hover { transform: translateY(-8px); box-shadow: 0 34px 60px -34px rgba(70,66,55,.6); }
-  .thumb { aspect-ratio: 16/11; overflow: hidden; background: var(--sage-soft); border-bottom: 1px solid var(--line); }
-  .thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
-  .card-body { padding: 24px 24px 26px; display: flex; flex-direction: column; flex: 1; }
-  .card .num { font-family: var(--font-label); font-size: .74rem; letter-spacing: .14em; text-transform: uppercase;
-    color: var(--coral); font-weight: 600; }
-  .card h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.5rem; margin: 6px 0 .4em; }
-  .card p { color: var(--muted); font-size: .95rem; margin: 0 0 18px; }
-  .card .mood { display: inline-flex; gap: 7px; margin-bottom: 18px; }
-  .card .mood span { width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(0,0,0,.06); }
-  .card .open { margin-top: auto; font-family: var(--font-label); font-weight: 600; font-size: .86rem;
-    color: var(--forest); letter-spacing: .04em; }
-  .card .open::after { content: " →"; }
-  .note { background: var(--cream); border: 1px solid var(--line); border-radius: 14px;
-    padding: 34px 36px; margin: 24px 0 0; display: grid; grid-template-columns: 1.3fr 1fr; gap: 30px; }
-  .note h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; margin: 0 0 12px; }
-  .note ul { margin: 0; padding-left: 18px; color: var(--muted); }
-  .note li { margin-bottom: 7px; }
-  .note .meta { border-left: 1px solid var(--line); padding-left: 30px; }
-  .note .meta p { color: var(--muted); font-size: .92rem; }
-  .foot { text-align: center; padding: 50px 0 60px; color: var(--muted); font-size: .85rem; }
-  .foot a { color: var(--forest); }
-  @media (max-width: 860px) { .cards { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
-    .note { grid-template-columns: 1fr; } .note .meta { border-left: 0; padding-left: 0;
-    border-top: 1px solid var(--line); padding-top: 20px; } }
-</style>
+<link rel="stylesheet" href="variant-1-editorial/style.css" />
 </head>
 <body>
-  <div class="wrap">
-    <div class="top">
-      <div class="mark">genny</div>
-      <p class="tag">Spritz, Elevated</p>
-    </div>
 
-    <div class="intro">
-      <p class="kick">Website prototypes</p>
-      <h1>Three directions to choose from.</h1>
-      <p>Each is a complete website that both promotes genny and invites investors — they differ in
-        emphasis and feel. Open each, then pick the direction that feels most like genny (or mix the
-        bits you love from each).</p>
-    </div>
+<!-- ============ HEADER ============ -->
+<header class="site-header" data-header>
+  <div class="container header-inner">
+    <a href="#top" class="brand wordmark">genny</a>
+    <button class="nav-toggle" data-nav-toggle aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" data-nav aria-label="Primary">
+      <a href="#story">The Name</a>
+      <a href="#flavors">Flavors</a>
+      <a href="#why">Why genny</a>
+      <a href="#founder">Founder</a>
+      <a href="#invest">Investors</a>
+      <a href="#list" class="nav-cta">Join the list</a>
+      <div class="nav-m">
+        <a href="#top" class="nav-toplink">Home / Top</a>
+        <span class="nav-cat">The drink</span>
+        <a href="#why" class="nav-sub">Why genny wins</a>
+        <a href="#flavors" class="nav-sub">Flavors</a>
+        <a href="#intersection" class="nav-sub">One drink, all four</a>
+        <span class="nav-cat">Our story</span>
+        <a href="#story" class="nav-sub">Behind the name</a>
+        <a href="#aesthetic" class="nav-sub">Made to be seen</a>
+        <span class="nav-cat">Why now</span>
+        <a href="#market" class="nav-sub">The market</a>
+        <a href="#competition" class="nav-sub">Competitive landscape</a>
+        <a href="#drinker" class="nav-sub">Meet the genny drinker</a>
+        <a href="#founder" class="nav-toplink">Founder Bio</a>
+        <a href="#invest" class="nav-toplink">Investment opportunity</a>
+        <a href="#list" class="nav-m-cta">Join the launch list</a>
+      </div>
+    </nav>
+  </div>
+</header>
 
-    <div class="cards">
-      <a class="card" href="variant-1-editorial/">
-        <div class="thumb"><img src="assets/thumb-v1.jpg" alt="Preview of the Elevated Editorial design" /></div>
-        <div class="card-body">
-          <span class="num">Direction 01</span>
-          <h2>Elevated Editorial</h2>
-          <p>Soft, premium and story-led — mirrors the pitch deck. Brand and the name story lead, with an
-            elegant investor section woven in.</p>
-          <span class="mood"><span style="background:var(--linen)"></span><span style="background:var(--sage)"></span><span style="background:var(--forest)"></span><span style="background:var(--coral)"></span></span>
-          <span class="open">Open this direction</span>
-        </div>
-      </a>
-      <a class="card" href="variant-2-modern/">
-        <div class="thumb"><img src="assets/thumb-v2.jpg" alt="Preview of the Clean Modern DTC design" /></div>
-        <div class="card-body">
-          <span class="num">Direction 02</span>
-          <h2>Clean Modern DTC</h2>
-          <p>Bright, product-forward and contemporary — mirrors the can design. Consumer energy up front,
-            with a clean investor band.</p>
-          <span class="mood"><span style="background:#fff"></span><span style="background:var(--cucumber)"></span><span style="background:var(--honeysuckle)"></span><span style="background:var(--rhubarb)"></span></span>
-          <span class="open">Open this direction</span>
-        </div>
-      </a>
-      <a class="card" href="variant-3-investor/">
-        <div class="thumb"><img src="assets/thumb-v3.jpg" alt="Preview of the Investor-Forward design" /></div>
-        <div class="card-body">
-          <span class="num">Direction 03</span>
-          <h2>Investor-Forward</h2>
-          <p>Structured and data-confident — mirrors the 1-pager. Built to raise, with the brand and
-            product in support.</p>
-          <span class="mood"><span style="background:var(--linen-deep)"></span><span style="background:var(--taupe)"></span><span style="background:var(--forest)"></span><span style="background:var(--coral)"></span></span>
-          <span class="open">Open this direction</span>
-        </div>
-      </a>
-    </div>
+<main id="top">
 
-    <div class="note">
-      <div>
-        <h3>What's in every direction</h3>
-        <ul>
-          <li>The story behind the name (Genny / Genevieve)</li>
-          <li>The three launch flavors + the future flavor roadmap</li>
-          <li>Why-now market story and founder credibility</li>
-          <li>The $500K raise, use-of-capital, and roadmap to launch</li>
-          <li>Launch-list email capture for the Jan 2027 launch</li>
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="hero-grid container">
+      <div class="hero-copy reveal">
+        <p class="eyebrow">No sugar added · Low alcohol · Real bubbles</p>
+        <h1 class="hero-word wordmark">genny</h1>
+        <p class="hero-tag">Spritz, Elevated</p>
+        <p class="hero-lede">The wine drinker's spritz — finally. A crafted wine spritz built on
+          quality white wine and beautifully unexpected, non-sweet flavors. Light, sessionable,
+          and made to be seen.</p>
+        <div class="hero-cta">
+          <a href="#list" class="btn btn-primary">Join the launch list</a>
+          <a href="#invest" class="btn btn-ghost" data-open-deck>For investors</a>
+        </div>
+        <p class="hero-foot">Launching January 2027 · 6.5% ABV · 250ml</p>
+      </div>
+      <figure class="hero-figure reveal" data-delay="1">
+        <img src="assets/lifestyle-trio.jpg" alt="Three cans of genny spritz — honeysuckle, cucumber and rhubarb — resting on linen with eucalyptus and baby's breath." />
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ WHY GENNY WINS ============ -->
+  <section class="why" id="why">
+    <div class="container">
+      <header class="sec-head reveal">
+        <p class="eyebrow">Why genny wins</p>
+        <h2>Built for how people drink now.</h2>
+        <p class="sec-sub">Consumers are redefining how alcohol fits into their lives — moving away from
+          sugary cocktails and high-ABV drinking, toward moderation, premium experiences, and cleaner
+          ingredients. genny is built for this shift.</p>
+      </header>
+      <ul class="prop-grid">
+        <li class="prop reveal">
+          <span class="prop-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10l-1.2 8a3.8 3.8 0 0 1-7.6 0L7 3z"/><path d="M12 14v5"/><path d="M9 21h6"/></svg></span>
+          <h3>Low alcohol</h3><p>A light, sessionable 6.5% ABV.</p>
+        </li>
+        <li class="prop reveal" data-delay="1">
+          <span class="prop-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+          <h3>No sugar added</h3><p>Flavor without the sweet — and no funky aftertaste.</p>
+        </li>
+        <li class="prop reveal" data-delay="2">
+          <span class="prop-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20c-1-8 5-15 15-15.5C20.5 13 14 21 5 20z"/><path d="M5 20c3.5-5 7-7.5 11-9"/></svg></span>
+          <h3>Premium ingredients</h3><p>A quality white-wine base with natural flavors.</p>
+        </li>
+        <li class="prop reveal">
+          <span class="prop-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.7a3 3 0 0 0 1.9 1.9L21.5 12l-5.7 1.9a3 3 0 0 0-1.9 1.9L12 21.5l-1.9-5.7a3 3 0 0 0-1.9-1.9L2.5 12l5.7-1.9a3 3 0 0 0 1.9-1.9z"/></svg></span>
+          <h3>Distinctive flavors</h3><p>Proprietary, non-sweet flavors that complement wine.</p>
+        </li>
+        <li class="prop reveal" data-delay="1">
+          <span class="prop-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="18" rx="2.6"/><path d="M8.4 7.5h7.2"/><path d="M8.4 16.5h7.2"/></svg></span>
+          <h3>Sleek 250ml can</h3><p>A convenient, premium single-serve pour.</p>
+        </li>
+        <li class="prop reveal" data-delay="2">
+          <span class="prop-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M12 13v8"/><path d="M9 18h6"/></svg></span>
+          <h3>Female owned</h3><p>Founded and operated by a 20-year wine veteran.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ FLAVORS ============ -->
+  <section class="flavors" id="flavors">
+    <div class="container">
+      <header class="sec-head center reveal">
+        <p class="eyebrow">The lineup</p>
+        <h2>Three flavors at launch.</h2>
+        <p class="sec-sub">Unique flavors that complement wine — provided without the sweet. Think of the
+          freshness of a garden, in a glass with bubbles.</p>
+      </header>
+      <div class="flavor-row">
+        <article class="flavor reveal" style="--accent:var(--honeysuckle)">
+          <div class="flavor-can"><img src="assets/can-honeysuckle.png" alt="genny honeysuckle spritz can" /></div>
+          <h3>Honeysuckle</h3>
+          <p>Soft, floral and fragrant — delicate sweetness without the sugar.</p>
+        </article>
+        <article class="flavor reveal" data-delay="1" style="--accent:var(--cucumber)">
+          <div class="flavor-can"><img src="assets/can-cucumber.png" alt="genny cucumber spritz can" /></div>
+          <h3>Cucumber</h3>
+          <p>Crisp, clean and cooling — the most refreshing pour of the three.</p>
+        </article>
+        <article class="flavor reveal" data-delay="2" style="--accent:var(--rhubarb)">
+          <div class="flavor-can"><img src="assets/can-rhubarb.png" alt="genny rhubarb spritz can" /></div>
+          <h3>Rhubarb</h3>
+          <p>Bright and tart with a garden edge — familiar, yet unexpected.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ THE INTERSECTION ============ -->
+  <section class="cm cm-bg-cream" id="intersection">
+    <div class="container">
+      <header class="sec-head center reveal">
+        <p class="eyebrow">What consumers want</p>
+        <h2>One drink that delivers on all four.</h2>
+        <p class="sec-sub">Flavor, format, function and value — genny sits at the intersection of
+          everything people actually want.</p>
+      </header>
+      <div class="cm-quad reveal">
+        <div class="cm-q"><span class="cm-q-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.7a3 3 0 0 0 1.9 1.9L21.5 12l-5.7 1.9a3 3 0 0 0-1.9 1.9L12 21.5l-1.9-5.7a3 3 0 0 0-1.9-1.9L2.5 12l5.7-1.9a3 3 0 0 0 1.9-1.9z"/></svg></span><h3>Flavor</h3><p>Unique, non-sweet flavors that complement wine.</p></div>
+        <div class="cm-q"><span class="cm-q-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="18" rx="2.6"/><path d="M8.4 7.5h7.2"/><path d="M8.4 16.5h7.2"/></svg></span><h3>Format</h3><p>A sleek 250ml can — modern, clean, made to be seen.</p></div>
+        <div class="cm-q"><span class="cm-q-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10l-1.2 8a3.8 3.8 0 0 1-7.6 0L7 3z"/><path d="M12 14v5"/><path d="M9 21h6"/></svg></span><h3>Function</h3><p>Low 6.5% ABV, no sugar added, sessionable.</p></div>
+        <div class="cm-q"><span class="cm-q-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-1.8 2.5-1.8s2.5.7 2.5 1.9c0 2.6-5 1.3-5 3.9 0 1.2 1.1 1.9 2.5 1.9s2.5-.6 2.5-1.8"/></svg></span><h3>Value</h3><p>A 4-pack for under $20 — accessible premium.</p></div>
+      </div>
+      <p class="cm-quad-total reveal"><b>genny</b> = one drink that delivers on all four.</p>
+    </div>
+  </section>
+
+  <!-- ============ PULL QUOTE ============ -->
+  <section class="pullquote">
+    <div class="container reveal">
+      <blockquote>
+        <span class="q">“</span>I want a good quality wine <em>with bubbles</em> and some <em>unique flavors.</em><span class="q">”</span>
+      </blockquote>
+      <p class="pq-attr">— the consumer voice driving <span class="wordmark">genny</span></p>
+    </div>
+  </section>
+
+  <!-- ============ STORY BEHIND THE NAME ============ -->
+  <section class="story" id="story">
+    <div class="container story-grid">
+      <figure class="story-figure reveal">
+        <img src="assets/og-genny.jpg" alt="The original Genny — Natasha's mother — wearing a pink feather boa and party hat." />
+      </figure>
+      <div class="story-copy reveal" data-delay="1">
+        <p class="eyebrow">The story behind the name</p>
+        <h2>Genny is for her.</h2>
+        <p>Genny is named for my mom — a 90-year-young Frenchwoman born <em>Genevieve</em>. When she
+          immigrated to America, she didn't love how English speakers said her name, so she simply
+          renamed herself. So her.</p>
+        <p>My mom isn't a wine person, despite what people assume. She's French, so everyone expects
+          her to be. Her drink of choice was White Zinfandel — until someone shamed her for it, and
+          quietly took the joy right out of her glass. I never forgot that.</p>
+        <p>Genny is for her. For everyone who just wants something delicious in their hand. No judging.
+          No apology. Just something yummy.</p>
+        <p class="story-kicker">Because what you like matters. Full stop.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AESTHETIC ============ -->
+  <section class="cm cm-bg-sage" id="aesthetic">
+    <div class="container reveal">
+      <div class="cm-aesthetic">
+        <p class="eyebrow">Made to be seen</p>
+        <blockquote>“A beautifully designed object can inspire trust, signify quality, and even command a premium.”</blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHY NOW / MARKET ============ -->
+  <section class="market" id="market">
+    <div class="container">
+      <header class="sec-head reveal">
+        <p class="eyebrow">Why now</p>
+        <h2>An elevated occasion no one owns yet.</h2>
+        <p class="sec-sub">The wine industry is changing as drinkers seek lighter styles, more variety,
+          and brand language that removes intimidation. Ready-to-drink has overtaken vodka in global
+          value — and wine-based RTDs are accelerating. genny sits in the white space between mass RTDs
+          and premium wine: elevated wine experiences in convenient, everyday moments.</p>
+      </header>
+      <div class="market-stats">
+        <div class="mstat reveal"><strong>+14%</strong><span>Wine-based RTD growth (2025)</span></div>
+        <div class="mstat reveal" data-delay="1"><strong>#1</strong><span>RTDs overtook vodka in global value</span></div>
+        <div class="mstat reveal" data-delay="2"><strong>25–55</strong><span>Drinkers seeking elevated, lighter options</span></div>
+        <div class="mstat reveal" data-delay="3"><strong>4</strong><span>Flavor · Format · Function · Value — genny delivers all four</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMPETITIVE LANDSCAPE ============ -->
+  <section class="cm cm-bg-linen" id="competition">
+    <div class="container">
+      <header class="sec-head reveal">
+        <p class="eyebrow">Competitive landscape</p>
+        <h2>Why genny — and not the usual options.</h2>
+        <p class="sec-sub">Wine-in-a-can hasn't earned trust, and zero-proof “mocktails” miss the people
+          who want some alcohol — just less. genny owns the elevated middle.</p>
+      </header>
+      <div class="cm-compare reveal">
+        <div class="cm-col"><p class="cm-col-label">Wine in a can</p><h3>Stuck on the basics</h3>
+          <ul><li>Mostly traditional varietals</li><li>Not known for quality</li><li>Little design or occasion appeal</li></ul></div>
+        <div class="cm-col"><p class="cm-col-label">Non-alc “mocktails”</p><h3>Sweet &amp; zero-proof</h3>
+          <ul><li>Often too sweet</li><li>Alt-sweetener aftertaste</li><li>Not everyone wants zero alcohol</li></ul></div>
+        <div class="cm-col win"><p class="cm-col-label">genny</p><h3>The elevated middle</h3>
+          <ul><li>Quality white-wine base, real bubbles</li><li>Unique, non-sweet flavors — no sugar added</li><li>Low (not no) alcohol at 6.5%</li><li>Designed to be seen</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TARGET CONSUMER ============ -->
+  <section class="cm cm-bg-cream" id="drinker">
+    <div class="container">
+      <header class="sec-head reveal">
+        <p class="eyebrow">Target consumer</p>
+        <h2>Meet the genny drinker.</h2>
+        <p class="sec-sub">An on-ramp into wine for a broad, social audience — and a no-commitment pour
+          for the people who already love it.</p>
+      </header>
+      <div class="cm-lifestyle reveal">
+        <figure><img src="assets/lifestyle-people-2.jpg" alt="Friends toasting cans of genny spritz on a boat by the marina" loading="lazy" /></figure>
+        <figure><img src="assets/lifestyle-people.jpg" alt="Friends toasting cans of genny spritz outdoors on a summer day" loading="lazy" /></figure>
+      </div>
+      <div class="cm-drinker reveal">
+        <div class="cm-pt"><span class="cm-pt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h5v16h-5"/><path d="M4 12h10"/><path d="M10 8l4 4-4 4"/></svg></span><h3>An on-ramp into wine</h3><p>A friendly, unintimidating way in.</p></div>
+        <div class="cm-pt"><span class="cm-pt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.2"/></svg></span><h3>LDA–55, skews 25–38</h3><p>The social sweet spot of curious drinkers.</p></div>
+        <div class="cm-pt"><span class="cm-pt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="9.5" r="2.2"/><path d="M16 14.2c2.2-.3 4 1.2 4 3.3"/></svg></span><h3>Women, male crossover</h3><p>Millennial, Gen Z &amp; Gen X women lead.</p></div>
+        <div class="cm-pt"><span class="cm-pt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.7a3 3 0 0 0 1.9 1.9L21.5 12l-5.7 1.9a3 3 0 0 0-1.9 1.9L12 21.5l-1.9-5.7a3 3 0 0 0-1.9-1.9L2.5 12l5.7-1.9a3 3 0 0 0 1.9-1.9z"/></svg></span><h3>Lapsed &amp; non-wine drinkers</h3><p>Seeking a low-commitment way back in.</p></div>
+        <div class="cm-pt"><span class="cm-pt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="18" rx="2.6"/><path d="M8.4 7.5h7.2"/><path d="M8.4 16.5h7.2"/></svg></span><h3>Everyday wine lovers</h3><p>Who want a single-serve pour.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOUNDER ============ -->
+  <section class="founder" id="founder">
+    <div class="container founder-grid">
+      <figure class="founder-figure reveal">
+        <img src="assets/founder-natasha.jpg" alt="Natasha Hayes, founder of genny." />
+      </figure>
+      <div class="founder-copy reveal" data-delay="1">
+        <p class="eyebrow">The founder</p>
+        <h2>Natasha Hayes</h2>
+        <p>Natasha brings 20+ years of commercial leadership across Constellation Brands, Treasury Wine
+          Estates, Jackson Family Wines, Crimson Wine Group, and WX Brands — scaling portfolios to $150M
+          and launching brands from concept to 100K+ cases.</p>
+        <p>She knows how wine gets made, priced, sold, and loved. genny is what that career has been
+          building toward.</p>
+        <blockquote class="founder-quote">“I am passionate about wine but not precious about it — and I
+          believe the best is yet to come when more people get to be part of it.”</blockquote>
+        <ul class="brand-strip" aria-label="Brands the founder has helped build">
+          <li>Kendall-Jackson</li><li>Lindeman's</li><li>Ravenswood</li>
+          <li>Bread &amp; Butter</li><li>Pine Ridge</li>
         </ul>
       </div>
-      <div class="meta">
-        <h3>Good to know</h3>
-        <p>Confidential financials are <strong>gated</strong> — the public pages tease the headline
-          numbers and put the full deck behind a “Request the deck” form. These are static prototypes:
-          forms open your email client and store nothing. Everything is ready to host on Netlify or
-          GitHub Pages.</p>
+    </div>
+  </section>
+
+  <!-- ============ INVESTMENT ============ -->
+  <section class="invest" id="invest">
+    <div class="container">
+      <header class="sec-head center reveal">
+        <p class="eyebrow">Investment opportunity</p>
+        <h2>Raising <span class="coral">$500,000</span> via SAFE.</h2>
+        <p class="sec-sub">Looking for a partner who sees what we see: a crafted wine spritz at the
+          intersection of premium RTD and functional wellness — in a category growing rapidly, with no
+          brand yet owning the elevated-occasion white space at accessible price parity with craft beer.</p>
+      </header>
+
+      <div class="invest-grid">
+        <div class="capital-card reveal">
+          <h3>Use of capital</h3>
+          <div class="capital-flex">
+            <svg class="donut" viewBox="0 0 120 120" role="img" aria-label="Use of capital: Production and dry goods 30%, Sales and trade tools 30%, Marketing 20%, Wine and flavor 20%.">
+              <g transform="rotate(-90 60 60)" fill="none" stroke-width="26">
+                <circle cx="60" cy="60" r="54" stroke="var(--forest)"    stroke-dasharray="101.8 237.5" stroke-dashoffset="0"/>
+                <circle cx="60" cy="60" r="54" stroke="var(--coral)"     stroke-dasharray="101.8 237.5" stroke-dashoffset="-101.8"/>
+                <circle cx="60" cy="60" r="54" stroke="var(--sage-deep)" stroke-dasharray="67.9 271.4"  stroke-dashoffset="-203.6"/>
+                <circle cx="60" cy="60" r="54" stroke="var(--taupe)"     stroke-dasharray="67.9 271.4"  stroke-dashoffset="-271.4"/>
+              </g>
+            </svg>
+            <ul class="capital-legend">
+              <li><span class="dot" style="background:var(--forest)"></span>Production &amp; dry goods<b>30%</b></li>
+              <li><span class="dot" style="background:var(--coral)"></span>Sales &amp; trade tools<b>30%</b></li>
+              <li><span class="dot" style="background:var(--sage-deep)"></span>Marketing<b>20%</b></li>
+              <li><span class="dot" style="background:var(--taupe)"></span>Wine &amp; flavor<b>20%</b></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="invest-side reveal" data-delay="1">
+          <div class="why-us">
+            <h3>Why now · why us</h3>
+            <p>The founder brings 20+ years in wine and CPG — brand management, pricing architecture, P&amp;L
+              ownership, and DTC strategy. Deep retail and distributor relationships enable rapid shelf
+              access an advantage a first-time founder can't replicate.</p>
+          </div>
+          <div class="teaser-row">
+            <div class="teaser"><strong>60.6%</strong><span>Gross margin at launch</span></div>
+            <div class="teaser"><strong>$18.99</strong><span>4-pack at shelf</span></div>
+            <div class="teaser"><strong>68–70%</strong><span>Margin path within 3 yrs</span></div>
+          </div>
+          <p class="gated-line">Full financials, projections, and the SAFE terms are in the investor deck.</p>
+          <button class="btn btn-coral" data-open-deck>Request the investor deck</button>
+        </div>
+      </div>
+
+      <!-- gated financials -->
+      <div class="financials reveal" data-financials>
+        <div class="fin-head">
+          <h3>The financials</h3>
+          <span class="fin-illustrative">Illustrative placeholder figures — full model in the deck</span>
+        </div>
+        <div class="fin-locked-wrap">
+          <div class="fin-content">
+            <div class="fin-years">
+              <div class="fin-year"><span>Year 1</span><strong>58%</strong><em>5,000 cases</em></div>
+              <div class="fin-year"><span>Year 2</span><strong>63%</strong><em>12,000 cases</em></div>
+              <div class="fin-year"><span>Year 3</span><strong>67%</strong><em>25,000 cases</em></div>
+              <div class="fin-year"><span>Year 4</span><strong>70%</strong><em>48,000 cases</em></div>
+              <div class="fin-year"><span>Year 5</span><strong>73%</strong><em>80,000 cases</em></div>
+            </div>
+            <div class="fin-grid3">
+              <div class="fin-mini">
+                <h4>Where the $19.99 goes · 4-pack</h4>
+                <ul class="wf">
+                  <li><span>Retailer</span><span class="wf-bar" style="width:100%;background:var(--sage-deep)"></span><b>$7.00</b></li>
+                  <li><span>Distributor</span><span class="wf-bar" style="width:49%;background:var(--taupe)"></span><b>$3.40</b></li>
+                  <li><span>COGS</span><span class="wf-bar" style="width:49%;background:var(--coral)"></span><b>$3.40</b></li>
+                  <li><span>Gross profit</span><span class="wf-bar" style="width:88%;background:var(--forest)"></span><b>$6.19</b></li>
+                </ul>
+              </div>
+              <div class="fin-mini">
+                <h4>COGS breakdown · per can</h4>
+                <div class="fin-donut">
+                  <svg viewBox="0 0 120 120" role="img" aria-label="COGS breakdown: wine 30%, can 28%, packaging 16%, other 14%, flavor 12%">
+                    <g transform="rotate(-90 60 60)" fill="none" stroke-width="22">
+                      <circle cx="60" cy="60" r="50" stroke="var(--forest)" stroke-dasharray="94.2 219.9" stroke-dashoffset="0"/>
+                      <circle cx="60" cy="60" r="50" stroke="var(--sage-deep)" stroke-dasharray="88.0 226.2" stroke-dashoffset="-94.2"/>
+                      <circle cx="60" cy="60" r="50" stroke="var(--taupe)" stroke-dasharray="50.3 263.9" stroke-dashoffset="-182.2"/>
+                      <circle cx="60" cy="60" r="50" stroke="var(--honeysuckle)" stroke-dasharray="44.0 270.2" stroke-dashoffset="-232.5"/>
+                      <circle cx="60" cy="60" r="50" stroke="var(--coral)" stroke-dasharray="37.7 276.5" stroke-dashoffset="-276.5"/>
+                    </g>
+                  </svg>
+                  <ul>
+                    <li><span class="dot" style="background:var(--forest)"></span>Wine<b>30%</b></li>
+                    <li><span class="dot" style="background:var(--sage-deep)"></span>Can<b>28%</b></li>
+                    <li><span class="dot" style="background:var(--taupe)"></span>Packaging<b>16%</b></li>
+                    <li><span class="dot" style="background:var(--honeysuckle)"></span>Other<b>14%</b></li>
+                    <li><span class="dot" style="background:var(--coral)"></span>Flavor<b>12%</b></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="fin-mini">
+                <h4>Gross margin vs category</h4>
+                <ul class="hbars">
+                  <li><div class="hbars-top"><span>Hard seltzer avg</span><b>48%</b></div><div class="track"><div class="fill" style="width:60%"></div></div></li>
+                  <li><div class="hbars-top"><span>Premium canned wine</span><b>56%</b></div><div class="track"><div class="fill" style="width:70%"></div></div></li>
+                  <li class="hi"><div class="hbars-top"><span>genny at launch</span><b>58%</b></div><div class="track"><div class="fill" style="width:72%"></div></div></li>
+                  <li class="hi"><div class="hbars-top"><span>genny at scale</span><b>73%</b></div><div class="track"><div class="fill" style="width:91%"></div></div></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="fin-lock">
+            <div class="fin-lock-card">
+              <span class="lock-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.4" r="1.1" fill="currentColor" stroke="none"/></svg></span>
+              <h4>Financials are gated</h4>
+              <p>Request access to view the full model — margins, unit economics, COGS, and 5-year projections.</p>
+              <button class="btn btn-coral" data-open-deck>Request access</button>
+              <p class="fin-have-code">Already have a code? <a href="investors/">View the financials →</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- roadmap — 1-pager-style icon timeline -->
+      <div class="roadmap reveal">
+        <h3>Roadmap to launch</h3>
+        <div class="tl">
+          <div class="tl-phase done" style="--n:5">
+            <span class="tl-phase-label">Completed</span>
+            <ol class="tl-nodes">
+              <li><span class="tl-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="18" rx="2.6"/><path d="M8.4 7.5h7.2"/><path d="M8.4 16.5h7.2"/></svg></span><span class="tl-label">Packaging</span></li>
+              <li><span class="tl-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20c-1-8 5-15 15-15.5C20.5 13 14 21 5 20z"/><path d="M5 20c3.5-5 7-7.5 11-9"/></svg></span><span class="tl-label">Flavor house</span></li>
+              <li><span class="tl-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><text x="12" y="15.4" text-anchor="middle" font-size="8.5" font-family="inherit" fill="currentColor" stroke="none" font-weight="600">TM</text></svg></span><span class="tl-label">Trademark &amp; domain</span></li>
+              <li><span class="tl-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10l-1.2 8a3.8 3.8 0 0 1-7.6 0L7 3z"/><path d="M12 14v5"/><path d="M9 21h6"/></svg></span><span class="tl-label">Sample</span></li>
+              <li><span class="tl-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.5 4 5.6 4 9s-1.4 6.5-4 9c-2.6-2.5-4-5.6-4-9s1.4-6.5 4-9z"/></svg></span><span class="tl-label">Build website</span></li>
+            </ol>
+          </div>
+          <div class="tl-phase prog" style="--n:1">
+            <span class="tl-phase-label">In progress</span>
+            <ol class="tl-nodes">
+              <li><span class="tl-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V10l5 3V9l5 3V8l8-4v17z"/><path d="M3 21h18"/></svg></span><span class="tl-label">Production run</span></li>
+            </ol>
+          </div>
+          <div class="tl-phase ahead" style="--n:4">
+            <span class="tl-phase-label">Ahead</span>
+            <ol class="tl-nodes">
+              <li><span class="tl-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V8"/><path d="M12 8L6 3M12 8l6-5"/><path d="M4 20h16"/><path d="M8 13l-4 4M16 13l4 4"/></svg></span><span class="tl-label">Distribution team</span></li>
+              <li><span class="tl-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/><path d="M3 4h2.4l2.2 11.5h10.2L20.5 8H7"/></svg></span><span class="tl-label">Retailer accounts</span></li>
+              <li><span class="tl-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="3.8"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg></span><span class="tl-label">Instagram + advertising</span></li>
+              <li class="tl-launch"><span class="tl-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15c-1 3-1 5-1 5s2 0 5-1"/><path d="M9 15l-1.5-1.5C9 8 13 4.5 19.5 4.5 19.5 11 16 15 10.5 16.5L9 15z"/><circle cx="14.5" cy="9.5" r="1.6"/></svg></span><span class="tl-label">Launch · Jan 2027</span></li>
+            </ol>
+          </div>
+        </div>
+        <p class="road-goal">Goal: <strong>100 accounts</strong> in the first 12 months.</p>
       </div>
     </div>
+  </section>
 
-    <div class="foot">
-      Built from genny's 1-pager &amp; pitch deck · <a href="mailto:natashaik@icloud.com">natashaik@icloud.com</a>
+  <!-- ============ LAUNCH LIST ============ -->
+  <section class="list" id="list">
+    <div class="container list-inner reveal">
+      <div class="list-copy">
+        <p class="eyebrow">Be first</p>
+        <h2>Join the launch list.</h2>
+        <p>Be the first to know when genny lands — plus where to find it near you.</p>
+      </div>
+      <form class="js-form list-form" data-subject="Add me to the genny launch list"
+            data-mailto="natashaik@icloud.com" novalidate>
+        <div class="form-fields">
+          <label class="sr-only" for="l-email">Email address</label>
+          <input id="l-email" type="email" name="email" data-label="Email" placeholder="you@email.com" required />
+          <button type="submit" class="btn btn-primary">Keep me posted</button>
+        </div>
+        <div class="form-success" role="status">✓ You're on the list — see you in January 2027.</div>
+      </form>
     </div>
+  </section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <span class="wordmark foot-word">genny</span>
+      <p class="foot-tag">Spritz, Elevated</p>
+    </div>
+    <div class="footer-contact">
+      <a href="mailto:natashaik@icloud.com">natashaik@icloud.com</a>
+      <a href="tel:+14156088050">(415) 608-8050</a>
+    </div>
+    <p class="footer-legal">© <span data-year>2026</span> genny. Please enjoy responsibly.
+      Investor materials confidential.</p>
   </div>
+</footer>
+
+<!-- ============ INVESTOR DECK MODAL ============ -->
+<div class="modal-overlay" data-modal>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deck-title">
+    <button class="modal-close" data-close aria-label="Close">×</button>
+    <h3 id="deck-title">Request access</h3>
+    <p class="modal-sub">A few details and Natasha will email you a private access code for the full
+      financials — plus the deck, projections, and SAFE terms.</p>
+    <form class="js-form" data-api="request-access" data-subject="Investor deck request — genny" data-mailto="natashaik@icloud.com" novalidate>
+      <div class="form-fields">
+        <label for="d-name">Name</label>
+        <input id="d-name" name="name" data-label="Name" type="text" placeholder="Your name" required />
+        <label for="d-email">Email</label>
+        <input id="d-email" name="email" data-label="Email" type="email" placeholder="you@email.com" required />
+        <label for="d-firm">Firm / fund <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
+        <input id="d-firm" name="firm" data-label="Firm" type="text" placeholder="Where you invest from" />
+        <label for="d-note">Note <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea id="d-note" name="note" data-label="Note" rows="3" placeholder="What you'd like to know"></textarea>
+        <button type="submit" class="btn btn-coral btn-full">Send request</button>
+        <p class="confidential-note">🔒 These materials are confidential and shared at the founder's discretion.</p>
+      </div>
+      <div class="form-success" role="status">✓ Thank you — your request is in. Natasha will email your
+        private access code shortly.</div>
+    </form>
+  </div>
+</div>
+
+<script src="assets/api.js"></script>
+<script src="assets/shared.js"></script>
 </body>
 </html>
