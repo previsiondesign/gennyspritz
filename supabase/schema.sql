@@ -68,3 +68,27 @@ alter table public.views          enable row level security;
 alter table public.financials     enable row level security;
 alter table public.auth_failures  enable row level security;
 alter table public.admin_settings enable row level security;
+
+create table if not exists public.launch_list (
+  id          bigint generated always as identity primary key,
+  email       text not null unique,
+  source      text not null default 'site',
+  created_at  timestamptz not null default now()
+);
+alter table public.launch_list enable row level security;
+
+create table if not exists public.bug_reports (
+  id          bigint generated always as identity primary key,
+  message     text not null,
+  image_path  text,                          -- object in the private bug-images bucket
+  status      text not null default 'open' check (status in ('open','resolved','reopened')),
+  notes       jsonb not null default '[]'::jsonb,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+alter table public.bug_reports enable row level security;
+
+-- private storage bucket for bug screenshots
+insert into storage.buckets (id, name, public)
+  values ('bug-images','bug-images', false)
+  on conflict (id) do nothing;

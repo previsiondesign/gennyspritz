@@ -111,7 +111,7 @@
         return;
       }
       // Build a mailto fallback so a real message is actually sent in the prototype
-      var to = form.getAttribute('data-mailto') || 'natashaik@icloud.com';
+      var to = form.getAttribute('data-mailto') || 'info@gennyspritz.com';
       var subject = form.getAttribute('data-subject') || 'genny — website inquiry';
       var lines = [];
       form.querySelectorAll('input, textarea').forEach(function (f) {
@@ -126,6 +126,21 @@
         form.classList.add('ok');
         try { window.location.href = href; } catch (err) { /* no-op */ }
       };
+
+      // Launch-list signups go to the backend (tracked in the dashboard);
+      // mailto only if the API is missing or unreachable.
+      if (form.getAttribute('data-api') === 'launch-list' &&
+          window.GennyAPI && window.GennyAPI.configured) {
+        var emailField = form.querySelector('input[type="email"]');
+        window.GennyAPI.call('/request', {
+          method: 'POST',
+          body: { kind: 'launch', email: emailField ? emailField.value.trim() : '' },
+        }).then(function (res) {
+          if (res.status === 200 && res.data && res.data.ok) form.classList.add('ok');
+          else mailtoFallback();
+        });
+        return;
+      }
 
       // Access requests go to the secure backend (lands in Natasha's
       // dashboard); mailto only if the API is missing or unreachable.

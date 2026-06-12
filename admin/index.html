@@ -54,6 +54,8 @@
       <a href="#requests">Requests <span class="ad-badge" id="badge-requests" hidden></span></a>
       <a href="#investors-sec">Investors</a>
       <a href="#financials-sec">Financials</a>
+      <a href="#launch-sec">Launch list <span class="ad-badge ghost" id="badge-launch" hidden></span></a>
+      <a href="#bugs-sec">Bugs &amp; changes</a>
       <a href="#settings-sec">Settings</a>
     </nav>
 
@@ -95,6 +97,40 @@
       <p class="inv-error" id="fin-error" hidden></p>
     </section>
 
+    <section id="launch-sec" class="ad-section">
+      <h2>Launch list</h2>
+      <p class="ad-sub">Everyone who signed up to hear about the launch.
+        <span class="ad-pill ghost" id="launch-count"></span></p>
+      <div class="ad-launch-actions">
+        <button class="btn-sm mail" id="copy-emails">Copy all emails</button>
+        <span class="ad-saved" id="copied-ok" hidden>✓ Copied to clipboard</span>
+        <form id="launch-add-form" class="ad-launch-add" novalidate>
+          <input id="launch-add-email" type="email" placeholder="Add an email manually" />
+          <button type="submit" class="btn-sm quiet">Add</button>
+        </form>
+      </div>
+      <div id="launch-list"></div>
+    </section>
+
+    <section id="bugs-sec" class="ad-section">
+      <h2>Bugs &amp; change requests</h2>
+      <p class="ad-sub">Spotted something wrong, or want something changed? Describe it here (attach a
+        screenshot if it helps) and Adam gets an email right away.</p>
+      <div class="ad-card ad-bug-form">
+        <textarea id="bug-text" rows="4" placeholder="What's the issue or change you'd like?"></textarea>
+        <div class="ad-bug-controls">
+          <label class="btn-sm quiet ad-file-label">📎 Attach screenshot
+            <input id="bug-file" type="file" accept="image/*" hidden />
+          </label>
+          <span id="bug-file-name" class="fe-hint"></span>
+          <button class="btn-sm grant" id="bug-submit">Submit</button>
+        </div>
+        <p class="inv-error" id="bug-error" hidden></p>
+        <p class="ad-saved" id="bug-ok" hidden>✓ Sent — Adam's on it.</p>
+      </div>
+      <div id="bugs-list"></div>
+    </section>
+
     <section id="settings-sec" class="ad-section">
       <h2>Settings</h2>
       <p class="ad-sub">You're signed out automatically after 10 minutes of inactivity, or when this
@@ -120,7 +156,7 @@
 
 <!-- financials edit dialog -->
 <div class="modal-overlay" id="fin-modal">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="finm-title">
+  <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="finm-title">
     <button class="modal-close" data-finm-close aria-label="Close">×</button>
     <h3 id="finm-title">Edit</h3>
     <p class="modal-sub" id="finm-sub"></p>

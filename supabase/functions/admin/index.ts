@@ -6,6 +6,7 @@ import { db, clientIp, delay } from '../_shared/db.ts';
 import { readJson, normEmail, str, validFinancials } from '../_shared/validate.ts';
 import { generateCode, sha256Hex } from '../_shared/codes.ts';
 import { DEFAULT_FINANCIALS, buildCodeEmail } from '../_shared/defaults.ts';
+import { sendEmail } from '../_shared/email.ts';
 
 const FAIL_WINDOW_MIN = 10;
 const FAIL_LIMIT = 20;
@@ -67,10 +68,12 @@ Deno.serve(async (req) => {
 
   // ---------- overview ----------
   if (action === 'overview' && req.method === 'GET') {
-    const [{ data: requests }, { data: investors }, { data: views }] = await Promise.all([
+    const [{ data: requests }, { data: investors }, { data: views }, { data: launchList }, { data: bugs }] = await Promise.all([
       supa.from('requests').select('*').order('created_at', { ascending: false }).limit(500),
       supa.from('investors').select('*').order('created_at', { ascending: false }),
       supa.from('views').select('email,viewed_at').order('viewed_at', { ascending: false }).limit(5000),
+      supa.from('launch_list').select('*').order('created_at', { ascending: false }).limit(2000),
+      supa.from('bug_reports').select('*').order('created_at', { ascending: false }).limit(200),
     ]);
     const byEmail: Record<string, string[]> = {};
     for (const v of views ?? []) (byEmail[v.email] ??= []).push(v.viewed_at);
@@ -86,7 +89,11 @@ Deno.serve(async (req) => {
       ...r,
       investorStatus: status[r.email] ?? 'none',
     }));
-    return json(req, 200, { ok: true, requests: reqs, investors: inv });
+    return json(req, 200, {
+      ok: true, requests: reqs, investors: inv,
+      launchList: launchList ?? [], bugs: bugs ?? [],
+      emailEnabled: !!Deno.env.get('RESEND_API_KEY'),
+    });
   }
 
   // ---------- financials ----------
@@ -209,6 +216,88 @@ Deno.serve(async (req) => {
     });
     if (error) return json(req, 500, { ok: false, reason: 'store' });
     return json(req, 200, { ok: true });
+  }
+
+  // ---------- launch list: manual add ----------
+  if (action === 'launch-add') {
+    const email = normEmail(body.email);
+    if (!email) return json(req, 400, { ok: false, reason: 'bad-email' });
+    const { error } = await supa.from('launch_list')
+      .upsert({ email, source: 'manual' }, { onConflict: 'email', ignoreDuplicates: true });
+    if (error) return json(req, 500, { ok: false, reason: 'store' });
+    return json(req, 200, { ok: true });
+  }
+
+  // ---------- bug / change-request report ----------
+  if (action === 'bug-report') {
+    const message = str(body.message, 4000);
+    if (!message) return json(req, 400, { ok: false, reason: 'bad-message' });
+    let imagePath: string | null = null;
+    const img = body.image as { name?: string; type?: string; dataBase64?: string } | undefined;
+    if (img?.dataBase64 && /^image\//.test(img.type ?? '')) {
+      try {
+        const bytes = Uint8Array.from(atob(img.dataBase64), (c) => c.charCodeAt(0));
+        if (bytes.length <= 4_500_000) {
+          const ext = (img.name ?? 'shot.png').split('.').pop()?.slice(0, 5) || 'png';
+          imagePath = `bug-${Date.now()}.${ext}`;
+          const { error: upErr } = await supa.storage.from('bug-images')
+            .upload(imagePath, bytes, { contentType: img.type });
+          if (upErr) imagePath = null;
+        }
+      } catch { imagePath = null; }
+    }
+    const { data: bug, error } = await supa.from('bug_reports')
+      .insert({ message, image_path: imagePath }).select('*').single();
+    if (error) return json(req, 500, { ok: false, reason: 'store' });
+
+    let imageLine = '';
+    if (imagePath) {
+      const { data: signed } = await supa.storage.from('bug-images')
+        .createSignedUrl(imagePath, 60 * 60 * 24 * 14);
+      if (signed?.signedUrl) imageLine = `\nScreenshot (link valid 14 days):\n${signed.signedUrl}\n`;
+    }
+    const mail = await sendEmail({
+      to: 'adam@previsiondesign.com',
+      subject: `genny dashboard — bug/change request #${bug.id}`,
+      text: `Natasha filed a bug / change request:\n\n${message}\n${imageLine}\nTrack it: ${Deno.env.get('SITE_BASE') ?? 'https://gennyspritz.com'}/admin/#bugs-sec`,
+    });
+    return json(req, 200, { ok: true, bug, emailSent: mail.sent });
+  }
+
+  // ---------- bug status (resolved / reopened with note) ----------
+  if (action === 'bug-status') {
+    const id = parseInt(str(body.id, 20), 10);
+    const newStatus = body.status === 'resolved' ? 'resolved' : body.status === 'reopened' ? 'reopened' : null;
+    if (!Number.isFinite(id) || !newStatus) return json(req, 400, { ok: false, reason: 'bad-input' });
+    const { data: bug } = await supa.from('bug_reports').select('*').eq('id', id).maybeSingle();
+    if (!bug) return json(req, 404, { ok: false, reason: 'no-bug' });
+    const notes = Array.isArray(bug.notes) ? bug.notes : [];
+    const note = str(body.note, 2000);
+    if (newStatus === 'reopened' && note) {
+      notes.push({ at: new Date().toISOString(), text: note });
+    }
+    const { error } = await supa.from('bug_reports')
+      .update({ status: newStatus, notes, updated_at: new Date().toISOString() }).eq('id', id);
+    if (error) return json(req, 500, { ok: false, reason: 'store' });
+    if (newStatus === 'reopened') {
+      await sendEmail({
+        to: 'adam@previsiondesign.com',
+        subject: `genny dashboard — request #${id} NOT resolved`,
+        text: `Natasha marked request #${id} as not resolved.\n\nOriginal:\n${bug.message}\n\nHer follow-up:\n${note || '(no detail given)'}`,
+      });
+    }
+    return json(req, 200, { ok: true });
+  }
+
+  // ---------- signed URL for a bug screenshot ----------
+  if (action === 'bug-image') {
+    const id = parseInt(str(body.id, 20), 10);
+    const { data: bug } = await supa.from('bug_reports').select('image_path').eq('id', id).maybeSingle();
+    if (!bug?.image_path) return json(req, 404, { ok: false, reason: 'no-image' });
+    const { data: signed, error } = await supa.storage.from('bug-images')
+      .createSignedUrl(bug.image_path, 3600);
+    if (error || !signed?.signedUrl) return json(req, 500, { ok: false, reason: 'sign' });
+    return json(req, 200, { ok: true, url: signed.signedUrl });
   }
 
   // ---------- dismiss request ----------

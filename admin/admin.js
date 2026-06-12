@@ -136,13 +136,111 @@
     var data = state.overview;
     renderRequests(data.requests || []);
     renderInvestors(data.investors || []);
+    renderLaunchList(data.launchList || []);
+    renderBugs(data.bugs || []);
     var fresh = (data.requests || []).filter(function (r) { return r.status === 'new'; }).length;
     $('badge-requests').hidden = fresh === 0;
     $('badge-requests').textContent = fresh;
+    $('badge-launch').hidden = !(data.launchList || []).length;
+    $('badge-launch').textContent = (data.launchList || []).length;
+    focusRequestFromUrl();
+  }
+
+  // ?focus=<requestId> — the approve link in notification emails
+  var focusDone = false;
+  function focusRequestFromUrl() {
+    if (focusDone) return;
+    var id = new URLSearchParams(location.search).get('focus');
+    if (!id) { focusDone = true; return; }
+    var row = document.querySelector('[data-request-id="' + id.replace(/[^\w-]/g, '') + '"]');
+    if (row) {
+      focusDone = true;
+      row.classList.add('ad-focus');
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(function () { row.classList.remove('ad-focus'); }, 6000);
+    }
+  }
+
+  function renderLaunchList(list) {
+    var mount = $('launch-list');
+    mount.innerHTML = '';
+    $('launch-count').textContent = list.length + (list.length === 1 ? ' signup' : ' signups');
+    state.launchEmails = list.map(function (l) { return l.email; });
+    if (!list.length) {
+      mount.appendChild(el('p', 'ad-empty', 'No signups captured yet — they appear here the moment someone joins the list on the site.'));
+      return;
+    }
+    var ul = el('ul', 'ad-launch-ul');
+    list.forEach(function (l) {
+      var li = el('li');
+      li.appendChild(el('span', null, l.email));
+      li.appendChild(el('em', null, fmt(l.created_at) + (l.source === 'manual' ? ' · added manually' : '')));
+      ul.appendChild(li);
+    });
+    mount.appendChild(ul);
+  }
+
+  function renderBugs(bugs) {
+    var mount = $('bugs-list');
+    mount.innerHTML = '';
+    if (!bugs.length) return;
+    bugs.forEach(function (b) {
+      var row = el('div', 'ad-row ad-bug-row');
+      var main = el('div', 'ad-row-main');
+      var name = el('div', 'ad-row-name', '#' + b.id);
+      name.appendChild(el('span', 'ad-pill ' + (b.status === 'resolved' ? 'active' : b.status === 'reopened' ? 'warn' : 'new'),
+        b.status === 'reopened' ? 'not resolved' : b.status));
+      main.appendChild(name);
+      main.appendChild(el('div', 'ad-row-meta', fmt(b.created_at, true)));
+      main.appendChild(el('div', 'ad-row-note', b.message));
+      (Array.isArray(b.notes) ? b.notes : []).forEach(function (n) {
+        main.appendChild(el('div', 'ad-bug-note', '↳ ' + fmt(n.at, true) + ': ' + n.text));
+      });
+      if (b.image_path) {
+        var link = el('a', 'ad-bug-img', 'View screenshot');
+        link.href = '#';
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          api('/admin/bug-image', { method: 'POST', body: { id: b.id } }).then(function (res) {
+            if (res.status === 200 && res.data.ok) window.open(res.data.url, '_blank');
+          }).catch(function () {});
+        });
+        main.appendChild(link);
+      }
+      row.appendChild(main);
+
+      var actions = el('div', 'ad-row-actions');
+      if (b.status !== 'resolved') {
+        actions.appendChild(btn('grant', 'Resolved', function () {
+          api('/admin/bug-status', { method: 'POST', body: { id: b.id, status: 'resolved' } })
+            .then(loadOverview).catch(function () {});
+        }));
+      }
+      actions.appendChild(btn('quiet', 'Not resolved', function () {
+        var existing = row.querySelector('.ad-reopen');
+        if (existing) { existing.remove(); return; }
+        var box = el('div', 'ad-reopen');
+        var ta = el('textarea');
+        ta.rows = 3; ta.placeholder = "What's still wrong, or what changed?";
+        box.appendChild(ta);
+        var send = el('button', 'btn-sm danger', 'Send to Adam');
+        send.type = 'button';
+        send.addEventListener('click', function () {
+          api('/admin/bug-status', { method: 'POST', body: { id: b.id, status: 'reopened', note: ta.value.trim() } })
+            .then(loadOverview).catch(function () {});
+        });
+        box.appendChild(send);
+        row.appendChild(box);
+        ta.focus();
+      }));
+      row.appendChild(actions);
+      mount.appendChild(row);
+    });
   }
 
   function requestRow(r) {
     var row = el('div', 'ad-row');
+    row.setAttribute('data-request-id', r.id);
     var main = el('div', 'ad-row-main');
     var nameLine = el('div', 'ad-row-name', r.type === 'reset' ? (r.name || r.email) : (r.name || '(no name)'));
     if (r.type === 'reset') nameLine.appendChild(el('span', 'ad-pill reset', 'code reset'));
@@ -299,174 +397,352 @@
   var txtVal = function (id, fb) { var n = $(id); return n && n.value.trim() ? n.value.trim() : fb; };
 
   var FIN_TITLES = {
-    years: '5-year margin & volume',
-    waterfall: 'Price waterfall · 4-pack',
-    cogs: 'COGS breakdown · per can',
-    benchmarks: 'Gross margin vs category',
+    topStats: 'Headline stats',
+    years: 'Year-by-year margin & volume',
+    narrative: 'Narrative',
+    waterfall: 'Price waterfall',
+    cogs: 'COGS breakdown',
+    benchmarks: 'Margin benchmarks',
+    evolution: 'Revenue, cost & margin evolution',
+    costCompress: 'Cost compression',
+    assumptions: 'Model assumptions',
     caption: 'Caption above the figures',
   };
   var FIN_SUBS = {
-    years: 'All five years in one place — gross margin % and case volume.',
+    topStats: 'The stat cards across the top. Tick “tint” to highlight one.',
+    years: 'Every year in one place — margin %, cases, revenue line and change-vs-launch.',
+    narrative: 'Short paragraphs shown to investors. Separate paragraphs with a blank line.',
     waterfall: 'Where the retail price goes. Gross profit recalculates automatically.',
-    cogs: 'Per-can cost split — aim for slices that sum to 100%.',
+    cogs: 'Slices should sum to 100%. Add or remove categories as needed.',
     benchmarks: 'How genny compares. Tick “genny” to highlight a row in coral.',
+    evolution: 'Per-year FOB price, COGS and gross margin — drives the line chart.',
+    costCompress: 'Cost components per year — drives the stacked bars.',
+    assumptions: 'Label / value pairs shown as the assumptions table.',
     caption: 'Shown to investors above the figures (e.g. “As of June 2026”).',
   };
-  var editing = null;   // section key while the dialog is open
+  var editing = null;        // section key while the dialog is open
+  var draft = null;          // working copy of the section being edited
+  var clone = function (v) { return JSON.parse(JSON.stringify(v)); };
+
+  // ---- tiny dialog builders (live-bound to `draft`) ----
+  function rowWrap() { return el('div', 'fe-list'); }
+  function bindText(obj, key, ph, cls) {
+    var i = el('input', cls || null);
+    i.type = 'text'; i.value = obj[key] != null ? obj[key] : ''; if (ph) i.placeholder = ph;
+    i.addEventListener('input', function () { obj[key] = i.value; });
+    return i;
+  }
+  function bindNum(obj, key, step) {
+    var i = el('input');
+    i.type = 'number'; i.step = step || '0.1'; i.value = obj[key];
+    i.addEventListener('input', function () {
+      var v = parseFloat(i.value);
+      if (Number.isFinite(v)) obj[key] = v;
+    });
+    return i;
+  }
+  function bindCheck(obj, key, label) {
+    var l = el('label', 'fe-unit');
+    var cb = el('input'); cb.type = 'checkbox'; cb.checked = !!obj[key];
+    cb.addEventListener('change', function () { obj[key] = cb.checked; });
+    l.appendChild(cb); l.appendChild(document.createTextNode(' ' + label));
+    return l;
+  }
+  function removeBtn(arr, idx, rebuild) {
+    var b = el('button', 'fe-x', '✕');
+    b.type = 'button'; b.title = 'Remove this row';
+    b.addEventListener('click', function () {
+      if (arr.length <= 1) return alert('Keep at least one row.');
+      arr.splice(idx, 1); rebuild();
+    });
+    return b;
+  }
+  function addBtn(label, onClick) {
+    var b = el('button', 'fe-add', '＋ ' + label);
+    b.type = 'button';
+    b.addEventListener('click', onClick);
+    return b;
+  }
+  function titleField(body, ph) {
+    if (!('title' in draft)) return;
+    var r = el('div', 'fe-row fe-title-row');
+    r.appendChild(el('label', null, 'Card heading'));
+    var i = bindText(draft, 'title', ph || 'Heading shown on the card');
+    i.style.gridColumn = '2 / -1';
+    r.appendChild(i);
+    body.appendChild(r);
+  }
 
   function buildDialog(section) {
-    var doc = state.finDoc;
-    // fresh node each time so per-dialog input listeners don't accumulate
+    // fresh node each time so per-dialog listeners don't accumulate
     var old = $('finm-body');
     var body = old.cloneNode(false);
     old.parentNode.replaceChild(body, old);
+    var rebuild = function () { buildDialog(section); };
 
-    if (section === 'years') {
-      var head = el('div', 'finm-head');
-      head.appendChild(el('span', null, ''));
-      head.appendChild(el('span', null, 'Margin %'));
-      head.appendChild(el('span', null, 'Cases'));
-      body.appendChild(head);
-      doc.years.forEach(function (y, k) {
-        var r = el('div', 'fe-row');
-        r.appendChild(el('label', null, y.label));
-        r.appendChild(numInput('finm-y-m-' + k, y.marginPct, '0.1'));
-        r.appendChild(numInput('finm-y-c-' + k, y.cases, '1'));
-        r.appendChild(el('span', 'fe-unit', ''));
+    if (section === 'caption') {
+      var r = el('div');
+      var i = bindText(draft, 'caption', 'e.g. Confidential · as of June 2026');
+      i.style.width = '100%';
+      r.appendChild(i);
+      body.appendChild(r);
+      return;
+    }
+
+    titleField(body);
+
+    if (section === 'topStats') {
+      draft.items.forEach(function (s, k) {
+        var r = el('div', 'fe-row fe-4col');
+        r.appendChild(bindText(s, 'label', 'Label'));
+        r.appendChild(bindText(s, 'value', '$0.00'));
+        r.appendChild(bindText(s, 'sub', 'Small sub-line'));
+        var end = el('span', 'fe-end');
+        end.appendChild(bindCheck(s, 'highlight', 'tint'));
+        end.appendChild(removeBtn(draft.items, k, rebuild));
+        r.appendChild(end);
         body.appendChild(r);
       });
+      body.appendChild(addBtn('Add stat', function () {
+        draft.items.push({ label: 'New stat', value: '—', sub: '' }); rebuild();
+      }));
+    }
+
+    if (section === 'years') {
+      var head = el('div', 'finm-head fe-5col');
+      ['Label', 'Margin %', 'Cases', 'Revenue line', 'Change'].forEach(function (h) {
+        head.appendChild(el('span', null, h));
+      });
+      body.appendChild(head);
+      draft.items.forEach(function (y, k) {
+        var r = el('div', 'fe-row fe-5col');
+        r.appendChild(bindText(y, 'label', 'Year 1'));
+        r.appendChild(bindNum(y, 'marginPct', '0.1'));
+        r.appendChild(bindNum(y, 'cases', '1'));
+        r.appendChild(bindText(y, 'revenue', '$1.0M revenue'));
+        var end = el('span', 'fe-end');
+        end.appendChild(bindText(y, 'delta', '+2.9 pts'));
+        end.appendChild(removeBtn(draft.items, k, rebuild));
+        r.appendChild(end);
+        body.appendChild(r);
+      });
+      body.appendChild(addBtn('Add year', function () {
+        draft.items.push({ label: 'Year ' + (draft.items.length + 1), marginPct: 60, cases: 1000, revenue: '', delta: '' });
+        rebuild();
+      }));
+    }
+
+    if (section === 'narrative') {
+      var ta = el('textarea', 'fe-textarea');
+      ta.rows = 7;
+      ta.value = (draft.paragraphs || []).join('\n\n');
+      ta.addEventListener('input', function () {
+        draft.paragraphs = ta.value.split(/\n\s*\n/).map(function (p) { return p.trim(); }).filter(Boolean);
+      });
+      body.appendChild(ta);
     }
 
     if (section === 'waterfall') {
+      var grossLine = el('p', 'fe-computed');
       var recompute = function () {
         var spent = 0;
-        doc.waterfall.rows.forEach(function (w, k) {
-          if (!w.computed) spent += numVal('finm-wf-a-' + k, w.amount);
+        draft.rows.forEach(function (w) { if (!w.computed) spent += w.amount; });
+        draft.rows.forEach(function (w) {
+          if (w.computed) w.amount = Math.max(0, Math.round((draft.retailPrice - spent) * 100) / 100);
         });
-        var gross = Math.max(0, Math.round((numVal('finm-wf-price', doc.waterfall.retailPrice) - spent) * 100) / 100);
-        var g = $('finm-wf-gross');
-        if (g) g.textContent = '$' + gross.toFixed(2);
+        var g = draft.rows.filter(function (w) { return w.computed; })[0];
+        grossLine.textContent = g ? (g.label + ' (auto): $' + g.amount.toFixed(2)) : '';
       };
       var rp = el('div', 'fe-row');
       rp.appendChild(el('label', null, 'Retail price'));
-      rp.appendChild(numInput('finm-wf-price', doc.waterfall.retailPrice, '0.01'));
+      rp.appendChild(bindNum(draft, 'retailPrice', '0.01'));
       rp.appendChild(el('span'));
-      rp.appendChild(el('span', 'fe-unit', '$'));
+      rp.appendChild(el('span', 'fe-unit', '$ per 4-pack'));
       body.appendChild(rp);
-      doc.waterfall.rows.forEach(function (w, k) {
+      draft.rows.forEach(function (w, k) {
+        if (w.computed) return;
         var r = el('div', 'fe-row');
-        r.appendChild(el('label', null, w.label));
-        if (w.computed) {
-          var c = el('span', 'fe-computed'); c.id = 'finm-wf-gross';
-          r.appendChild(c);
-          r.appendChild(el('span'));
-          r.appendChild(el('span', 'fe-unit', 'auto'));
-        } else {
-          r.appendChild(numInput('finm-wf-a-' + k, w.amount, '0.01'));
-          r.appendChild(el('span'));
-          r.appendChild(el('span', 'fe-unit', '$'));
-        }
+        r.appendChild(bindText(w, 'label', 'Row label'));
+        r.appendChild(bindNum(w, 'amount', '0.01'));
+        var end = el('span', 'fe-end');
+        end.appendChild(el('span', 'fe-unit', '$'));
+        end.appendChild(removeBtn(draft.rows, k, rebuild));
+        r.appendChild(end);
         body.appendChild(r);
       });
+      body.appendChild(grossLine);
+      body.appendChild(addBtn('Add row', function () {
+        draft.rows.splice(draft.rows.length - 1, 0, { label: 'New row', amount: 0 }); rebuild();
+      }));
       body.addEventListener('input', recompute);
       recompute();
     }
 
     if (section === 'cogs') {
+      var hint = el('p', 'fe-hint');
       var sumHint = function () {
-        var sum = 0;
-        doc.cogs.slices.forEach(function (s, k) { sum += numVal('finm-cg-p-' + k, s.pct); });
-        var hint = $('finm-cogs-hint');
-        if (hint) {
-          hint.textContent = 'Slices sum to ' + Math.round(sum * 10) / 10 + '%';
-          hint.className = 'fe-hint' + (Math.abs(sum - 100) > 0.5 ? ' bad' : '');
-        }
+        var sum = draft.slices.reduce(function (a, s) { return a + s.pct; }, 0);
+        hint.textContent = 'Slices sum to ' + (Math.round(sum * 10) / 10).toFixed(1) + '%';
+        hint.className = 'fe-hint' + (Math.abs(sum - 100) > 0.5 ? ' bad' : '');
       };
-      doc.cogs.slices.forEach(function (s, k) {
+      draft.slices.forEach(function (s, k) {
         var r = el('div', 'fe-row');
-        r.appendChild(textInput('finm-cg-l-' + k, s.label));
-        r.appendChild(numInput('finm-cg-p-' + k, s.pct, '0.1'));
-        r.appendChild(el('span'));
-        r.appendChild(el('span', 'fe-unit', '%'));
+        r.appendChild(bindText(s, 'label', 'Category'));
+        r.appendChild(bindNum(s, 'pct', '0.1'));
+        var end = el('span', 'fe-end');
+        end.appendChild(el('span', 'fe-unit', '%'));
+        end.appendChild(removeBtn(draft.slices, k, rebuild));
+        r.appendChild(end);
         body.appendChild(r);
       });
-      var hint = el('p', 'fe-hint'); hint.id = 'finm-cogs-hint';
       body.appendChild(hint);
+      body.appendChild(addBtn('Add category', function () {
+        draft.slices.push({ label: 'New category', pct: 0 }); rebuild();
+      }));
       body.addEventListener('input', sumHint);
       sumHint();
     }
 
     if (section === 'benchmarks') {
-      doc.benchmarks.rows.forEach(function (b, k) {
+      draft.rows.forEach(function (b, k) {
         var r = el('div', 'fe-row');
-        r.appendChild(textInput('finm-bm-l-' + k, b.label));
-        r.appendChild(numInput('finm-bm-p-' + k, b.pct, '0.1'));
-        var hl = el('label', 'fe-unit');
-        var cb = el('input'); cb.type = 'checkbox'; cb.id = 'finm-bm-h-' + k; cb.checked = !!b.highlight;
-        hl.appendChild(cb); hl.appendChild(document.createTextNode(' genny'));
-        r.appendChild(hl);
-        r.appendChild(el('span', 'fe-unit', '%'));
+        r.appendChild(bindText(b, 'label', 'Benchmark'));
+        r.appendChild(bindNum(b, 'pct', '0.1'));
+        var end = el('span', 'fe-end');
+        end.appendChild(bindCheck(b, 'highlight', 'genny'));
+        end.appendChild(removeBtn(draft.rows, k, rebuild));
+        r.appendChild(end);
         body.appendChild(r);
       });
+      body.appendChild(addBtn('Add row', function () {
+        draft.rows.push({ label: 'New benchmark', pct: 50 }); rebuild();
+      }));
     }
 
-    if (section === 'caption') {
-      var r = el('div');
-      r.appendChild(textInput('finm-caption', doc.caption, 'e.g. As of June 2026 — full model in the deck'));
-      r.querySelector('input').style.width = '100%';
-      body.appendChild(r);
+    if (section === 'evolution') {
+      var subR = el('div', 'fe-row fe-title-row');
+      subR.appendChild(el('label', null, 'Sub-heading'));
+      var subI = bindText(draft, 'sub', 'e.g. Per 4-pack · FOB basis');
+      subI.style.gridColumn = '2 / -1';
+      subR.appendChild(subI);
+      body.appendChild(subR);
+      var head = el('div', 'finm-head fe-4col');
+      ['Label', 'FOB $', 'COGS $', 'Margin %'].forEach(function (h) { head.appendChild(el('span', null, h)); });
+      body.appendChild(head);
+      draft.rows.forEach(function (r0, k) {
+        var r = el('div', 'fe-row fe-4col');
+        r.appendChild(bindText(r0, 'label', 'Y1'));
+        r.appendChild(bindNum(r0, 'fob', '0.01'));
+        r.appendChild(bindNum(r0, 'cogs', '0.01'));
+        var end = el('span', 'fe-end');
+        end.appendChild(bindNum(r0, 'marginPct', '0.1'));
+        end.appendChild(removeBtn(draft.rows, k, rebuild));
+        r.appendChild(end);
+        body.appendChild(r);
+      });
+      body.appendChild(addBtn('Add year', function () {
+        draft.rows.push({ label: 'Y' + (draft.rows.length + 1), fob: 10, cogs: 3, marginPct: 65 }); rebuild();
+      }));
+    }
+
+    if (section === 'costCompress') {
+      var subR2 = el('div', 'fe-row fe-title-row');
+      subR2.appendChild(el('label', null, 'Sub-heading'));
+      var subI2 = bindText(draft, 'sub', 'e.g. COGS composition per 4-pack');
+      subI2.style.gridColumn = '2 / -1';
+      subR2.appendChild(subI2);
+      body.appendChild(subR2);
+      body.appendChild(el('p', 'fe-hint', 'Cost components (the chart colors):'));
+      draft.components.forEach(function (c, k) {
+        var r = el('div', 'fe-row fe-comp');
+        var i = el('input'); i.type = 'text'; i.value = c;
+        i.addEventListener('input', function () { draft.components[k] = i.value; });
+        r.appendChild(i);
+        var x = el('button', 'fe-x', '✕'); x.type = 'button';
+        x.addEventListener('click', function () {
+          if (draft.components.length <= 1) return alert('Keep at least one component.');
+          draft.components.splice(k, 1);
+          draft.rows.forEach(function (row) { row.values.splice(k, 1); });
+          rebuild();
+        });
+        r.appendChild(x);
+        body.appendChild(r);
+      });
+      body.appendChild(addBtn('Add component', function () {
+        draft.components.push('New component');
+        draft.rows.forEach(function (row) { row.values.push(0); });
+        rebuild();
+      }));
+      body.appendChild(el('p', 'fe-hint', 'Per-year values ($):'));
+      draft.rows.forEach(function (row, rk) {
+        var r = el('div', 'fe-row fe-grid');
+        r.style.gridTemplateColumns = '90px repeat(' + draft.components.length + ', 1fr) auto';
+        r.appendChild(bindText(row, 'label', 'Y1'));
+        row.values.forEach(function (_, vk) {
+          var i = el('input'); i.type = 'number'; i.step = '0.01'; i.value = row.values[vk];
+          i.title = draft.components[vk];
+          i.addEventListener('input', function () {
+            var v = parseFloat(i.value);
+            if (Number.isFinite(v)) row.values[vk] = v;
+          });
+          r.appendChild(i);
+        });
+        r.appendChild(removeBtn(draft.rows, rk, rebuild));
+        body.appendChild(r);
+      });
+      body.appendChild(addBtn('Add year', function () {
+        draft.rows.push({ label: 'Y' + (draft.rows.length + 1), values: draft.components.map(function () { return 0; }) });
+        rebuild();
+      }));
+    }
+
+    if (section === 'assumptions') {
+      draft.rows.forEach(function (a, k) {
+        var r = el('div', 'fe-row');
+        r.appendChild(bindText(a, 'label', 'Assumption'));
+        r.appendChild(bindText(a, 'value', 'Value'));
+        var end = el('span', 'fe-end');
+        end.appendChild(removeBtn(draft.rows, k, rebuild));
+        r.appendChild(end);
+        body.appendChild(r);
+      });
+      body.appendChild(addBtn('Add assumption', function () {
+        draft.rows.push({ label: 'New assumption', value: '—' }); rebuild();
+      }));
     }
   }
 
   function openEditor(section) {
     editing = section;
+    draft = section === 'caption'
+      ? { caption: state.finDoc.caption }
+      : clone(state.finDoc[section] || {});
     $('finm-title').textContent = FIN_TITLES[section] || 'Edit';
     $('finm-sub').textContent = FIN_SUBS[section] || '';
     $('finm-error').hidden = true;
     buildDialog(section);
     $('fin-modal').classList.add('open');
-    var first = $('finm-body').querySelector('input');
+    var first = $('finm-body').querySelector('input, textarea');
     if (first) setTimeout(function () { first.focus(); }, 120);
   }
 
   function closeEditor() {
     editing = null;
+    draft = null;
     $('fin-modal').classList.remove('open');
   }
 
   function collectSection(section) {
-    var doc = JSON.parse(JSON.stringify(state.finDoc));
-    if (section === 'years') {
-      doc.years.forEach(function (y, k) {
-        y.marginPct = numVal('finm-y-m-' + k, y.marginPct);
-        y.cases = numVal('finm-y-c-' + k, y.cases);
-      });
-    }
+    var doc = clone(state.finDoc);
+    doc.v = 2;
+    if (section === 'caption') doc.caption = (draft.caption || '').trim();
+    else doc[section] = clone(draft);
     if (section === 'waterfall') {
-      doc.waterfall.retailPrice = numVal('finm-wf-price', doc.waterfall.retailPrice);
       var spent = 0;
-      doc.waterfall.rows.forEach(function (w, k) {
-        if (!w.computed) { w.amount = numVal('finm-wf-a-' + k, w.amount); spent += w.amount; }
-      });
+      doc.waterfall.rows.forEach(function (w) { if (!w.computed) spent += w.amount; });
       doc.waterfall.rows.forEach(function (w) {
         if (w.computed) w.amount = Math.max(0, Math.round((doc.waterfall.retailPrice - spent) * 100) / 100);
       });
-    }
-    if (section === 'cogs') {
-      doc.cogs.slices.forEach(function (s, k) {
-        s.label = txtVal('finm-cg-l-' + k, s.label);
-        s.pct = numVal('finm-cg-p-' + k, s.pct);
-      });
-    }
-    if (section === 'benchmarks') {
-      doc.benchmarks.rows.forEach(function (b, k) {
-        b.label = txtVal('finm-bm-l-' + k, b.label);
-        b.pct = numVal('finm-bm-p-' + k, b.pct);
-        b.highlight = !!($('finm-bm-h-' + k) || {}).checked;
-      });
-    }
-    if (section === 'caption') {
-      doc.caption = txtVal('finm-caption', '');
     }
     return doc;
   }
@@ -563,6 +839,63 @@
         $('add-error').hidden = false;
       }
     }).catch(function () {});
+  });
+
+  // ---- launch list ----
+  $('copy-emails').addEventListener('click', function () {
+    var emails = (state.launchEmails || []).join(', ');
+    if (!emails) return;
+    navigator.clipboard && navigator.clipboard.writeText(emails).then(function () {
+      $('copied-ok').hidden = false;
+      setTimeout(function () { $('copied-ok').hidden = true; }, 2500);
+    });
+  });
+  $('launch-add-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = $('launch-add-email').value.trim();
+    if (!email) return;
+    api('/admin/launch-add', { method: 'POST', body: { email: email } }).then(function (res) {
+      if (res.status === 200 && res.data.ok) { $('launch-add-email').value = ''; loadOverview(); }
+    }).catch(function () {});
+  });
+
+  // ---- bugs & change requests ----
+  var bugImage = null;
+  $('bug-file').addEventListener('change', function () {
+    var f = $('bug-file').files[0];
+    bugImage = null;
+    $('bug-file-name').textContent = '';
+    if (!f) return;
+    if (!/^image\//.test(f.type)) { $('bug-file-name').textContent = 'Images only, please.'; return; }
+    if (f.size > 4_000_000) { $('bug-file-name').textContent = 'That image is over 4 MB — try a smaller screenshot.'; return; }
+    var reader = new FileReader();
+    reader.onload = function () {
+      bugImage = { name: f.name, type: f.type, dataBase64: String(reader.result).split(',')[1] };
+      $('bug-file-name').textContent = '📎 ' + f.name;
+    };
+    reader.readAsDataURL(f);
+  });
+  $('bug-submit').addEventListener('click', function () {
+    $('bug-error').hidden = true; $('bug-ok').hidden = true;
+    var message = $('bug-text').value.trim();
+    if (!message) { $('bug-error').textContent = 'Describe the issue first.'; $('bug-error').hidden = false; return; }
+    $('bug-submit').disabled = true; $('bug-submit').textContent = 'Sending…';
+    api('/admin/bug-report', { method: 'POST', body: { message: message, image: bugImage }, timeoutMs: 30000 })
+      .then(function (res) {
+        $('bug-submit').disabled = false; $('bug-submit').textContent = 'Submit';
+        if (res.status === 200 && res.data.ok) {
+          $('bug-text').value = ''; $('bug-file').value = ''; $('bug-file-name').textContent = '';
+          bugImage = null;
+          $('bug-ok').hidden = false;
+          setTimeout(function () { $('bug-ok').hidden = true; }, 4000);
+          loadOverview();
+        } else {
+          $('bug-error').textContent = 'Could not send — please try again.';
+          $('bug-error').hidden = false;
+        }
+      }).catch(function () {
+        $('bug-submit').disabled = false; $('bug-submit').textContent = 'Submit';
+      });
   });
 
   $('finm-save').addEventListener('click', saveEditor);
