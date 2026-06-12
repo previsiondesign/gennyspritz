@@ -80,12 +80,32 @@ body { background: var(--linen); }
 .ad-add-form input { flex: 1 1 160px; padding: 10px 12px; border: 1px solid var(--line);
   border-radius: 5px; background: #fff; font-family: var(--font-body); }
 
-/* financials editor */
-#fin-form { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-.fe-group { background: var(--cream); border: 1px solid var(--line); border-radius: 10px; padding: 20px 22px; }
-.fe-group h3 { font-family: var(--font-label); text-transform: uppercase; letter-spacing: .1em;
-  font-size: .74rem; color: var(--muted); margin-bottom: 14px; }
-.fe-row { display: grid; grid-template-columns: minmax(90px,1.4fr) 1fr 1fr auto; gap: 8px;
+/* financials — WYSIWYG preview with per-card edit pencils */
+.fin-edit-btn { position: absolute; top: 8px; right: 8px; width: 27px; height: 27px;
+  border-radius: 50%; border: 1px solid var(--line); background: #fff; color: var(--forest);
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  opacity: .88; box-shadow: 0 3px 10px rgba(20, 26, 20, .18); transition: opacity .15s, background .15s; }
+.fin-edit-btn:hover { opacity: 1; background: var(--sage-soft); }
+.fin-edit-btn svg { width: 13px; height: 13px; }
+.ad-preview .fin-mini { position: relative; }
+.ad-preview .fin-year { position: relative; }
+.ad-preview .fin-year .fin-edit-btn { top: 5px; right: 5px; width: 22px; height: 22px; }
+.ad-preview .fin-year .fin-edit-btn svg { width: 11px; height: 11px; }
+
+.ad-caption-row { display: flex; align-items: center; gap: 12px; background: var(--cream);
+  border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; margin-bottom: 14px;
+  font-size: .92rem; }
+.ad-caption-label { font-family: var(--font-label); text-transform: uppercase; letter-spacing: .1em;
+  font-size: .68rem; font-weight: 600; color: var(--muted); flex: none; }
+.ad-caption-row em { color: #45433d; flex: 1; min-width: 0; }
+.ad-caption-row .fin-edit-btn { position: static; flex: none; }
+
+/* edit-dialog rows */
+.finm-actions { display: flex; gap: 10px; margin-top: 20px; }
+.finm-head { display: grid; grid-template-columns: 72px 1fr 1fr; gap: 8px; margin-bottom: 6px;
+  font-family: var(--font-label); text-transform: uppercase; letter-spacing: .08em;
+  font-size: .66rem; color: var(--muted); }
+.fe-row { display: grid; grid-template-columns: minmax(72px,1fr) 1.2fr 1.2fr auto; gap: 8px;
   align-items: center; margin-bottom: 8px; }
 .fe-row label { font-size: .84rem; color: #45433d; }
 .fe-row input[type="text"], .fe-row input[type="number"] { width: 100%; padding: 8px 10px;

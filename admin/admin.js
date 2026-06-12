@@ -58,6 +58,9 @@
   function lock(msg) {
     state.key = null;
     dropKey();
+    var fm = $('fin-modal');
+    if (fm) fm.classList.remove('open');
+    editing = null;
     $('dash').hidden = true; $('refresh').hidden = true; $('lock').hidden = true;
     $('gate').hidden = false;
     $('gate-pass').value = '';
@@ -251,162 +254,231 @@
     investors.forEach(function (i) { mount.appendChild(investorRow(i)); });
   }
 
-  // ---------- financials editor ----------
+  // ---------- financials: WYSIWYG preview + per-card edit dialogs ----------
   function loadFinancials() {
     return api('/admin/financials').then(function (res) {
       if (res.status === 200 && res.data.ok) {
         state.finDoc = res.data.financials;
         $('fin-status').hidden = !res.data.isDefault;
-        buildFinForm(state.finDoc);
-        refreshPreview();
+        renderFin();
       }
     }).catch(function () {});
+  }
+
+  function renderFin() {
+    $('fin-caption-text').textContent = state.finDoc.caption || '(no caption)';
+    var mount = $('fin-preview');
+    mount.innerHTML = '';
+    mount.appendChild(window.renderFinancials(state.finDoc, { onEdit: openEditor }));
   }
 
   function numInput(id, value, step) {
     var i = el('input');
     i.type = 'number'; i.id = id; i.step = step || 'any'; i.value = value;
-    i.addEventListener('input', refreshPreviewDebounced);
     return i;
   }
   function textInput(id, value, ph) {
     var i = el('input');
     i.type = 'text'; i.id = id; i.value = value; if (ph) i.placeholder = ph;
-    i.addEventListener('input', refreshPreviewDebounced);
     return i;
   }
+  var numVal = function (id, fb) { var v = parseFloat(($(id) || {}).value); return Number.isFinite(v) ? v : fb; };
+  var txtVal = function (id, fb) { var n = $(id); return n && n.value.trim() ? n.value.trim() : fb; };
 
-  function buildFinForm(doc) {
-    var f = $('fin-form');
-    f.innerHTML = '';
+  var FIN_TITLES = {
+    years: '5-year margin & volume',
+    waterfall: 'Price waterfall · 4-pack',
+    cogs: 'COGS breakdown · per can',
+    benchmarks: 'Gross margin vs category',
+    caption: 'Caption above the figures',
+  };
+  var FIN_SUBS = {
+    years: 'All five years in one place — gross margin % and case volume.',
+    waterfall: 'Where the retail price goes. Gross profit recalculates automatically.',
+    cogs: 'Per-can cost split — aim for slices that sum to 100%.',
+    benchmarks: 'How genny compares. Tick “genny” to highlight a row in coral.',
+    caption: 'Shown to investors above the figures (e.g. “As of June 2026”).',
+  };
+  var editing = null;   // section key while the dialog is open
 
-    // years
-    var g1 = el('div', 'fe-group');
-    g1.appendChild(el('h3', null, '5-year margin & volume'));
-    doc.years.forEach(function (y, k) {
-      var r = el('div', 'fe-row');
-      r.appendChild(el('label', null, y.label));
-      r.appendChild(numInput('y-m-' + k, y.marginPct, '0.1'));
-      r.appendChild(numInput('y-c-' + k, y.cases, '1'));
-      r.appendChild(el('span', 'fe-unit', '% · cases'));
-      g1.appendChild(r);
-    });
-    f.appendChild(g1);
+  function buildDialog(section) {
+    var doc = state.finDoc;
+    // fresh node each time so per-dialog input listeners don't accumulate
+    var old = $('finm-body');
+    var body = old.cloneNode(false);
+    old.parentNode.replaceChild(body, old);
 
-    // waterfall
-    var g2 = el('div', 'fe-group');
-    g2.appendChild(el('h3', null, 'Price waterfall · 4-pack'));
-    var rp = el('div', 'fe-row');
-    rp.appendChild(el('label', null, 'Retail price'));
-    rp.appendChild(numInput('wf-price', doc.waterfall.retailPrice, '0.01'));
-    rp.appendChild(el('span'));
-    rp.appendChild(el('span', 'fe-unit', '$'));
-    g2.appendChild(rp);
-    doc.waterfall.rows.forEach(function (w, k) {
-      var r = el('div', 'fe-row');
-      r.appendChild(el('label', null, w.label));
-      if (w.computed) {
-        var c = el('span', 'fe-computed'); c.id = 'wf-computed';
-        r.appendChild(c);
+    if (section === 'years') {
+      var head = el('div', 'finm-head');
+      head.appendChild(el('span', null, ''));
+      head.appendChild(el('span', null, 'Margin %'));
+      head.appendChild(el('span', null, 'Cases'));
+      body.appendChild(head);
+      doc.years.forEach(function (y, k) {
+        var r = el('div', 'fe-row');
+        r.appendChild(el('label', null, y.label));
+        r.appendChild(numInput('finm-y-m-' + k, y.marginPct, '0.1'));
+        r.appendChild(numInput('finm-y-c-' + k, y.cases, '1'));
+        r.appendChild(el('span', 'fe-unit', ''));
+        body.appendChild(r);
+      });
+    }
+
+    if (section === 'waterfall') {
+      var recompute = function () {
+        var spent = 0;
+        doc.waterfall.rows.forEach(function (w, k) {
+          if (!w.computed) spent += numVal('finm-wf-a-' + k, w.amount);
+        });
+        var gross = Math.max(0, Math.round((numVal('finm-wf-price', doc.waterfall.retailPrice) - spent) * 100) / 100);
+        var g = $('finm-wf-gross');
+        if (g) g.textContent = '$' + gross.toFixed(2);
+      };
+      var rp = el('div', 'fe-row');
+      rp.appendChild(el('label', null, 'Retail price'));
+      rp.appendChild(numInput('finm-wf-price', doc.waterfall.retailPrice, '0.01'));
+      rp.appendChild(el('span'));
+      rp.appendChild(el('span', 'fe-unit', '$'));
+      body.appendChild(rp);
+      doc.waterfall.rows.forEach(function (w, k) {
+        var r = el('div', 'fe-row');
+        r.appendChild(el('label', null, w.label));
+        if (w.computed) {
+          var c = el('span', 'fe-computed'); c.id = 'finm-wf-gross';
+          r.appendChild(c);
+          r.appendChild(el('span'));
+          r.appendChild(el('span', 'fe-unit', 'auto'));
+        } else {
+          r.appendChild(numInput('finm-wf-a-' + k, w.amount, '0.01'));
+          r.appendChild(el('span'));
+          r.appendChild(el('span', 'fe-unit', '$'));
+        }
+        body.appendChild(r);
+      });
+      body.addEventListener('input', recompute);
+      recompute();
+    }
+
+    if (section === 'cogs') {
+      var sumHint = function () {
+        var sum = 0;
+        doc.cogs.slices.forEach(function (s, k) { sum += numVal('finm-cg-p-' + k, s.pct); });
+        var hint = $('finm-cogs-hint');
+        if (hint) {
+          hint.textContent = 'Slices sum to ' + Math.round(sum * 10) / 10 + '%';
+          hint.className = 'fe-hint' + (Math.abs(sum - 100) > 0.5 ? ' bad' : '');
+        }
+      };
+      doc.cogs.slices.forEach(function (s, k) {
+        var r = el('div', 'fe-row');
+        r.appendChild(textInput('finm-cg-l-' + k, s.label));
+        r.appendChild(numInput('finm-cg-p-' + k, s.pct, '0.1'));
         r.appendChild(el('span'));
-        r.appendChild(el('span', 'fe-unit', 'auto'));
-      } else {
-        r.appendChild(numInput('wf-a-' + k, w.amount, '0.01'));
-        r.appendChild(el('span'));
-        r.appendChild(el('span', 'fe-unit', '$'));
-      }
-      g2.appendChild(r);
-    });
-    f.appendChild(g2);
+        r.appendChild(el('span', 'fe-unit', '%'));
+        body.appendChild(r);
+      });
+      var hint = el('p', 'fe-hint'); hint.id = 'finm-cogs-hint';
+      body.appendChild(hint);
+      body.addEventListener('input', sumHint);
+      sumHint();
+    }
 
-    // cogs
-    var g3 = el('div', 'fe-group');
-    g3.appendChild(el('h3', null, 'COGS breakdown · per can'));
-    doc.cogs.slices.forEach(function (s, k) {
-      var r = el('div', 'fe-row');
-      r.appendChild(textInput('cg-l-' + k, s.label));
-      r.appendChild(numInput('cg-p-' + k, s.pct, '0.1'));
-      r.appendChild(el('span'));
-      r.appendChild(el('span', 'fe-unit', '%'));
-      g3.appendChild(r);
-    });
-    var hint = el('p', 'fe-hint'); hint.id = 'cogs-hint';
-    g3.appendChild(hint);
-    f.appendChild(g3);
+    if (section === 'benchmarks') {
+      doc.benchmarks.rows.forEach(function (b, k) {
+        var r = el('div', 'fe-row');
+        r.appendChild(textInput('finm-bm-l-' + k, b.label));
+        r.appendChild(numInput('finm-bm-p-' + k, b.pct, '0.1'));
+        var hl = el('label', 'fe-unit');
+        var cb = el('input'); cb.type = 'checkbox'; cb.id = 'finm-bm-h-' + k; cb.checked = !!b.highlight;
+        hl.appendChild(cb); hl.appendChild(document.createTextNode(' genny'));
+        r.appendChild(hl);
+        r.appendChild(el('span', 'fe-unit', '%'));
+        body.appendChild(r);
+      });
+    }
 
-    // benchmarks
-    var g4 = el('div', 'fe-group');
-    g4.appendChild(el('h3', null, 'Gross margin vs category'));
-    doc.benchmarks.rows.forEach(function (b, k) {
-      var r = el('div', 'fe-row');
-      r.appendChild(textInput('bm-l-' + k, b.label));
-      r.appendChild(numInput('bm-p-' + k, b.pct, '0.1'));
-      var hl = el('label', 'fe-unit');
-      var cb = el('input'); cb.type = 'checkbox'; cb.id = 'bm-h-' + k; cb.checked = !!b.highlight;
-      cb.addEventListener('change', refreshPreviewDebounced);
-      hl.appendChild(cb); hl.appendChild(document.createTextNode(' genny'));
-      r.appendChild(hl);
-      r.appendChild(el('span', 'fe-unit', '%'));
-      g4.appendChild(r);
-    });
-    f.appendChild(g4);
-
-    // caption
-    var g5 = el('div', 'fe-group fe-caption');
-    g5.appendChild(el('h3', null, 'Caption shown above the figures'));
-    g5.appendChild(textInput('fin-caption', doc.caption, 'e.g. As of June 2026 — full model in the deck'));
-    f.appendChild(g5);
+    if (section === 'caption') {
+      var r = el('div');
+      r.appendChild(textInput('finm-caption', doc.caption, 'e.g. As of June 2026 — full model in the deck'));
+      r.querySelector('input').style.width = '100%';
+      body.appendChild(r);
+    }
   }
 
-  function collectDoc() {
-    var base = state.finDoc;
-    var num = function (id, fb) { var v = parseFloat(($(id) || {}).value); return Number.isFinite(v) ? v : fb; };
-    var txt = function (id, fb) { var n = $(id); return n && n.value.trim() ? n.value.trim() : fb; };
-    var doc = JSON.parse(JSON.stringify(base));
-    doc.years.forEach(function (y, k) {
-      y.marginPct = num('y-m-' + k, y.marginPct);
-      y.cases = num('y-c-' + k, y.cases);
-    });
-    doc.waterfall.retailPrice = num('wf-price', doc.waterfall.retailPrice);
-    var spent = 0;
-    doc.waterfall.rows.forEach(function (w, k) {
-      if (!w.computed) { w.amount = num('wf-a-' + k, w.amount); spent += w.amount; }
-    });
-    doc.waterfall.rows.forEach(function (w) {
-      if (w.computed) w.amount = Math.max(0, Math.round((doc.waterfall.retailPrice - spent) * 100) / 100);
-    });
-    doc.cogs.slices.forEach(function (s, k) {
-      s.label = txt('cg-l-' + k, s.label);
-      s.pct = num('cg-p-' + k, s.pct);
-    });
-    doc.benchmarks.rows.forEach(function (b, k) {
-      b.label = txt('bm-l-' + k, b.label);
-      b.pct = num('bm-p-' + k, b.pct);
-      b.highlight = !!($('bm-h-' + k) || {}).checked;
-    });
-    doc.caption = txt('fin-caption', '');
+  function openEditor(section) {
+    editing = section;
+    $('finm-title').textContent = FIN_TITLES[section] || 'Edit';
+    $('finm-sub').textContent = FIN_SUBS[section] || '';
+    $('finm-error').hidden = true;
+    buildDialog(section);
+    $('fin-modal').classList.add('open');
+    var first = $('finm-body').querySelector('input');
+    if (first) setTimeout(function () { first.focus(); }, 120);
+  }
+
+  function closeEditor() {
+    editing = null;
+    $('fin-modal').classList.remove('open');
+  }
+
+  function collectSection(section) {
+    var doc = JSON.parse(JSON.stringify(state.finDoc));
+    if (section === 'years') {
+      doc.years.forEach(function (y, k) {
+        y.marginPct = numVal('finm-y-m-' + k, y.marginPct);
+        y.cases = numVal('finm-y-c-' + k, y.cases);
+      });
+    }
+    if (section === 'waterfall') {
+      doc.waterfall.retailPrice = numVal('finm-wf-price', doc.waterfall.retailPrice);
+      var spent = 0;
+      doc.waterfall.rows.forEach(function (w, k) {
+        if (!w.computed) { w.amount = numVal('finm-wf-a-' + k, w.amount); spent += w.amount; }
+      });
+      doc.waterfall.rows.forEach(function (w) {
+        if (w.computed) w.amount = Math.max(0, Math.round((doc.waterfall.retailPrice - spent) * 100) / 100);
+      });
+    }
+    if (section === 'cogs') {
+      doc.cogs.slices.forEach(function (s, k) {
+        s.label = txtVal('finm-cg-l-' + k, s.label);
+        s.pct = numVal('finm-cg-p-' + k, s.pct);
+      });
+    }
+    if (section === 'benchmarks') {
+      doc.benchmarks.rows.forEach(function (b, k) {
+        b.label = txtVal('finm-bm-l-' + k, b.label);
+        b.pct = numVal('finm-bm-p-' + k, b.pct);
+        b.highlight = !!($('finm-bm-h-' + k) || {}).checked;
+      });
+    }
+    if (section === 'caption') {
+      doc.caption = txtVal('finm-caption', '');
+    }
     return doc;
   }
 
-  var previewTimer = null;
-  function refreshPreviewDebounced() {
-    clearTimeout(previewTimer);
-    previewTimer = setTimeout(refreshPreview, 250);
-  }
-  function refreshPreview() {
-    var doc = collectDoc();
-    var computed = $('wf-computed');
-    var gross = doc.waterfall.rows.filter(function (w) { return w.computed; })[0];
-    if (computed && gross) computed.textContent = '$' + gross.amount.toFixed(2);
-    var sum = doc.cogs.slices.reduce(function (a, s) { return a + s.pct; }, 0);
-    var hint = $('cogs-hint');
-    if (hint) {
-      hint.textContent = 'Slices sum to ' + Math.round(sum * 10) / 10 + '%';
-      hint.className = 'fe-hint' + (Math.abs(sum - 100) > 0.5 ? ' bad' : '');
-    }
-    var mount = $('fin-preview');
-    mount.innerHTML = '';
-    mount.appendChild(window.renderFinancials(doc));
+  function saveEditor() {
+    if (!editing) return;
+    var doc = collectSection(editing);
+    $('finm-error').hidden = true;
+    $('finm-save').disabled = true; $('finm-save').textContent = 'Publishing…';
+    api('/admin/financials', { method: 'PUT', body: doc }).then(function (res) {
+      $('finm-save').disabled = false; $('finm-save').textContent = 'Save & publish';
+      if (res.status === 200 && res.data.ok) {
+        state.finDoc = doc;
+        closeEditor();
+        renderFin();
+        $('fin-status').hidden = true;
+        $('fin-live').hidden = false;
+        setTimeout(function () { $('fin-live').hidden = true; }, 4000);
+      } else {
+        $('finm-error').textContent = 'Could not publish — please check the numbers and try again.';
+        $('finm-error').hidden = false;
+      }
+    }).catch(function () {
+      $('finm-save').disabled = false; $('finm-save').textContent = 'Save & publish';
+    });
   }
 
   // ---------- wire up ----------
@@ -480,20 +552,16 @@
     }).catch(function () {});
   });
 
-  $('fin-save').addEventListener('click', function () {
-    $('fin-error').hidden = true; $('fin-saved').hidden = true;
-    var doc = collectDoc();
-    api('/admin/financials', { method: 'PUT', body: doc }).then(function (res) {
-      if (res.status === 200 && res.data.ok) {
-        state.finDoc = doc;
-        $('fin-saved').hidden = false;
-        $('fin-status').hidden = true;
-        setTimeout(function () { $('fin-saved').hidden = true; }, 4000);
-      } else {
-        $('fin-error').textContent = 'Save failed: ' + (res.data && res.data.reason || 'error');
-        $('fin-error').hidden = false;
-      }
-    }).catch(function () {});
+  $('finm-save').addEventListener('click', saveEditor);
+  $('caption-edit').addEventListener('click', function () { openEditor('caption'); });
+  document.querySelectorAll('[data-finm-close]').forEach(function (b) {
+    b.addEventListener('click', closeEditor);
+  });
+  $('fin-modal').addEventListener('click', function (e) {
+    if (e.target === $('fin-modal')) closeEditor();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && editing) closeEditor();
   });
 
   var savedKey = readKey();

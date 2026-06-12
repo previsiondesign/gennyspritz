@@ -83,16 +83,16 @@
 
     <section id="financials-sec" class="ad-section">
       <h2>Financials</h2>
-      <p class="ad-sub">These numbers are what investors see, live. <span id="fin-status"
-        class="ad-pill warn" hidden>placeholder figures — not saved yet</span></p>
-      <form id="fin-form"></form>
-      <div class="ad-fin-actions">
-        <button class="btn btn-coral" id="fin-save">Save &amp; publish</button>
-        <span id="fin-saved" class="ad-saved" hidden>✓ Saved — investors now see these figures</span>
-        <p class="inv-error" id="fin-error" hidden></p>
+      <p class="ad-sub">This is exactly what investors see, live. Click any ✎ to change the figures.
+        <span id="fin-status" class="ad-pill warn" hidden>placeholder figures — not saved yet</span>
+        <span id="fin-live" class="ad-saved" hidden>✓ Published — investors now see this</span></p>
+      <div class="ad-caption-row">
+        <span class="ad-caption-label">Caption</span>
+        <em id="fin-caption-text"></em>
+        <button class="fin-edit-btn" id="caption-edit" type="button" aria-label="Edit the caption" title="Edit the caption"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></button>
       </div>
-      <h3 class="ad-preview-h">Live preview (what investors see)</h3>
       <div id="fin-preview" class="ad-preview"></div>
+      <p class="inv-error" id="fin-error" hidden></p>
     </section>
 
     <section id="settings-sec" class="ad-section">
@@ -117,6 +117,21 @@
 
   </div>
 </main>
+
+<!-- financials edit dialog -->
+<div class="modal-overlay" id="fin-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="finm-title">
+    <button class="modal-close" data-finm-close aria-label="Close">×</button>
+    <h3 id="finm-title">Edit</h3>
+    <p class="modal-sub" id="finm-sub"></p>
+    <div id="finm-body"></div>
+    <p class="inv-error" id="finm-error" hidden></p>
+    <div class="finm-actions">
+      <button class="btn btn-coral" id="finm-save" type="button">Save &amp; publish</button>
+      <button class="btn btn-ghost" data-finm-close type="button">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <script src="../assets/api.js"></script>
 <script src="../assets/financials-render.js"></script>

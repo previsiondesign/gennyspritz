@@ -120,13 +120,48 @@
     return box;
   }
 
-  window.renderFinancials = function (doc) {
+  // opts.onEdit(section): when provided (founder dashboard), every card gets
+  // a pencil button — sections: 'years' | 'waterfall' | 'cogs' | 'benchmarks'.
+  // The investor page calls without opts and renders untouched.
+  window.renderFinancials = function (doc, opts) {
+    opts = opts || {};
+    var editable = typeof opts.onEdit === 'function';
+
+    function pencil(section, label) {
+      var b = el('button', 'fin-edit-btn');
+      b.type = 'button';
+      b.setAttribute('aria-label', 'Edit ' + label);
+      b.title = 'Edit ' + label;
+      b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+        'stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>';
+      b.addEventListener('click', function () { opts.onEdit(section); });
+      return b;
+    }
+
     var root = el('div', 'fin-content');
-    root.appendChild(renderYears(doc.years || []));
+    var years = renderYears(doc.years || []);
+    if (editable) {
+      years.querySelectorAll('.fin-year').forEach(function (y) {
+        y.appendChild(pencil('years', 'the 5-year figures'));
+      });
+    }
+    root.appendChild(years);
     var grid = el('div', 'fin-grid3');
-    if (doc.waterfall) grid.appendChild(renderWaterfall(doc.waterfall));
-    if (doc.cogs) grid.appendChild(renderCogs(doc.cogs));
-    if (doc.benchmarks) grid.appendChild(renderBenchmarks(doc.benchmarks));
+    if (doc.waterfall) {
+      var wf = renderWaterfall(doc.waterfall);
+      if (editable) wf.appendChild(pencil('waterfall', 'the price waterfall'));
+      grid.appendChild(wf);
+    }
+    if (doc.cogs) {
+      var cg = renderCogs(doc.cogs);
+      if (editable) cg.appendChild(pencil('cogs', 'the COGS breakdown'));
+      grid.appendChild(cg);
+    }
+    if (doc.benchmarks) {
+      var bm = renderBenchmarks(doc.benchmarks);
+      if (editable) bm.appendChild(pencil('benchmarks', 'the margin benchmarks'));
+      grid.appendChild(bm);
+    }
     root.appendChild(grid);
     return root;
   };
