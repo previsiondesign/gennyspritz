@@ -28,7 +28,8 @@ create table if not exists public.investors (
   updated_at  timestamptz not null default now(),
   revoked_at  timestamptz,
   request_id  uuid,
-  agreed_at   timestamptz                  -- when they accepted the terms of access
+  agreed_at   timestamptz,                 -- when they accepted the terms of access
+  code_emailed_at timestamptz              -- when a code email was last drafted for the current code
 );
 
 create table if not exists public.views (

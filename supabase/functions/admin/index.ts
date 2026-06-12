@@ -128,7 +128,8 @@ Deno.serve(async (req) => {
 
     const { data: existing } = await supa.from('investors').select('*').eq('email', email).maybeSingle();
     // idempotent on active; NEW code when re-granting a revoked investor
-    const code = existing?.status === 'active' ? existing.code : generateCode();
+    const sameCode = existing?.status === 'active';
+    const code = sameCode ? existing.code : generateCode();
     const now = new Date().toISOString();
     const { error } = await supa.from('investors').upsert({
       email,
@@ -140,6 +141,8 @@ Deno.serve(async (req) => {
       revoked_at: null,
       request_id: requestId || existing?.request_id || null,
       created_at: existing?.created_at ?? now,
+      // a fresh code hasn't been emailed yet; an unchanged code keeps its history
+      code_emailed_at: sameCode ? (existing?.code_emailed_at ?? null) : null,
     });
     if (error) return json(req, 500, { ok: false, reason: 'store' });
     if (requestId) {
@@ -172,12 +175,22 @@ Deno.serve(async (req) => {
     if (inv.status !== 'active') return json(req, 409, { ok: false, reason: 'revoked' });
     const code = generateCode();
     const { error } = await supa.from('investors')
-      .update({ code, updated_at: new Date().toISOString() }).eq('email', email);
+      .update({ code, updated_at: new Date().toISOString(), code_emailed_at: null }).eq('email', email);
     if (error) return json(req, 500, { ok: false, reason: 'store' });
     return json(req, 200, {
       ok: true, code,
       emailDraft: buildCodeEmail(inv.name, email, code),
     });
+  }
+
+  // ---------- mark the current code's email as drafted ----------
+  if (action === 'mark-emailed') {
+    const email = normEmail(body.email);
+    if (!email) return json(req, 400, { ok: false, reason: 'bad-email' });
+    const { error } = await supa.from('investors')
+      .update({ code_emailed_at: new Date().toISOString() }).eq('email', email);
+    if (error) return json(req, 500, { ok: false, reason: 'store' });
+    return json(req, 200, { ok: true });
   }
 
   // ---------- change passcode ----------

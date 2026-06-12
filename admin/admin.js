@@ -106,11 +106,18 @@
     var first = (name || '').trim().split(/\s+/)[0] || 'there';
     return {
       subject: 'Your private access code for genny financials',
-      body: 'Hi ' + first + ',\n\nThank you for your interest in genny. Your private access code is:\n\n    ' +
-        code + '\n\nView the financials here:\n' + SITE_BASE + '/investors/\n\nSign in with your email (' +
-        email + ') and the code above. The code stays valid until access is closed. These materials are ' +
-        "confidential — please don't forward them.\n\n— Natasha\nnatashaik@icloud.com · (415) 608-8050",
+      body: 'Hi ' + first + ',\n\nThank you for your interest in genny!\n\n' +
+        "I've granted you access to our financial data. Your personal code is:\n\n" +
+        code + '\n\nView the financials here:\n' + SITE_BASE + '/investors/\n\n' +
+        'Sign in with your email (' + email + ') and the code above.\n' +
+        "Note: These materials are confidential — please don't forward or share them without permission.\n\n" +
+        'Natasha\nnatasha@gennyspritz.com\n(415) 608-8050',
     };
+  }
+
+  // remember that the current code's email has been drafted (hides Draft email)
+  function markEmailed(email) {
+    return api('/admin/mark-emailed', { method: 'POST', body: { email: email } }).catch(function () {});
   }
 
   function copyable(code) {
@@ -159,7 +166,7 @@
               api('/admin/dismiss', { method: 'POST', body: { requestId: r.id } });
             }
             mailtoDraft(r.email, res.data.emailDraft);
-            loadOverview();
+            markEmailed(r.email).then(loadOverview);
           } else {
             alert('Could not grant: ' + (res.data && res.data.reason || 'error'));
           }
@@ -222,14 +229,17 @@
 
     var actions = el('div', 'ad-row-actions');
     if (i.status === 'active') {
-      actions.appendChild(btn('mail', 'Draft email', function () {
-        mailtoDraft(i.email, clientDraft(i.name, i.email, i.code));
-      }));
+      // Draft email shows only while the current code hasn't been emailed yet
+      // (fresh grant or after New code); drafting it hides the button again.
+      if (!i.code_emailed_at) {
+        actions.appendChild(btn('mail', 'Draft email', function () {
+          mailtoDraft(i.email, clientDraft(i.name, i.email, i.code));
+          markEmailed(i.email).then(loadOverview);
+        }));
+      }
       actions.appendChild(btn('quiet', 'New code', function () {
-        if (!confirm('Generate a NEW code for ' + i.email + '? The old code stops working.')) return;
-        api('/admin/regenerate', { method: 'POST', body: { email: i.email } }).then(function (res) {
-          if (res.status === 200 && res.data.ok) { mailtoDraft(i.email, res.data.emailDraft); loadOverview(); }
-        }).catch(function () {});
+        if (!confirm('Generate a NEW code for ' + i.email + '? The old code stops working, and you can email the new one with Draft email.')) return;
+        api('/admin/regenerate', { method: 'POST', body: { email: i.email } }).then(loadOverview).catch(function () {});
       }));
       actions.appendChild(btn('danger', 'Revoke', function () {
         if (!confirm('Revoke access for ' + i.email + '? They are blocked immediately.')) return;
@@ -239,7 +249,10 @@
       actions.appendChild(btn('grant', 'Re-grant', function () {
         api('/admin/grant', { method: 'POST', body: { email: i.email, name: i.name, firm: i.firm } })
           .then(function (res) {
-            if (res.status === 200 && res.data.ok) { mailtoDraft(i.email, res.data.emailDraft); loadOverview(); }
+            if (res.status === 200 && res.data.ok) {
+              mailtoDraft(i.email, res.data.emailDraft);
+              markEmailed(i.email).then(loadOverview);
+            }
           }).catch(function () {});
       }));
     }
@@ -544,7 +557,7 @@
       if (res.status === 200 && res.data.ok) {
         $('add-name').value = ''; $('add-email').value = ''; $('add-firm').value = '';
         mailtoDraft(email, res.data.emailDraft);
-        loadOverview();
+        markEmailed(email).then(loadOverview);
       } else {
         $('add-error').textContent = 'Could not add: ' + (res.data && res.data.reason || 'error');
         $('add-error').hidden = false;

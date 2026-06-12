@@ -49,18 +49,20 @@ export function buildCodeEmail(name: string, email: string, code: string) {
     body:
 `Hi ${first},
 
-Thank you for your interest in genny. Your private access code is:
+Thank you for your interest in genny!
 
-    ${code}
+I've granted you access to our financial data. Your personal code is:
+
+${code}
 
 View the financials here:
 ${SITE_BASE}/investors/
 
-Sign in with your email (${email}) and the code above. The code stays
-valid until access is closed. These materials are confidential —
-please don't forward them.
+Sign in with your email (${email}) and the code above.
+Note: These materials are confidential — please don't forward or share them without permission.
 
-— Natasha
-natashaik@icloud.com · (415) 608-8050`,
+Natasha
+natasha@gennyspritz.com
+(415) 608-8050`,
   };
 }
