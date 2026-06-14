@@ -7,6 +7,7 @@ import { sendEmail } from '../_shared/email.ts';
 import { SITE_BASE } from '../_shared/defaults.ts';
 
 const NOTIFY_TO = Deno.env.get('NOTIFY_REQUESTS_TO') ?? 'investor-request@gennyspritz.com';
+const NOTIFY_LAUNCH_TO = Deno.env.get('NOTIFY_LAUNCH_TO') ?? NOTIFY_TO;
 
 Deno.serve(async (req) => {
   const pf = preflight(req);
@@ -29,9 +30,21 @@ Deno.serve(async (req) => {
 
   // ---- launch-list signup ----
   if (body.kind === 'launch') {
-    const { error } = await supa.from('launch_list')
-      .upsert({ email, source: str(body.source, 60) || 'site' }, { onConflict: 'email', ignoreDuplicates: true });
+    // ignoreDuplicates -> a repeat email returns no row, so we notify once only
+    const { data: added, error } = await supa.from('launch_list')
+      .upsert({ email, source: str(body.source, 60) || 'site' }, { onConflict: 'email', ignoreDuplicates: true })
+      .select('id');
     if (error) return json(req, 500, { ok: false, reason: 'store' });
+    if (added && added.length) {
+      await sendEmail({
+        to: NOTIFY_LAUNCH_TO,
+        subject: `genny — new launch-list signup: ${email}`,
+        text: `${email} just joined the genny launch list.
+
+See everyone who's signed up:
+${SITE_BASE}/admin/#launch-sec`,
+      });
+    }
     return json(req, 200, { ok: true });
   }
 
