@@ -125,7 +125,8 @@
   function renderCogs(cogs, opts) {
     var box = card(cogs.title, 'cogs', opts);
     var flex = el('div', 'fin-donut');
-    var svg = svgEl('svg', { viewBox: '0 0 120 120', role: 'img',
+    // viewBox padded by 4 so the 22-wide stroke (outer radius 61) isn't clipped at the edges
+    var svg = svgEl('svg', { viewBox: '-4 -4 128 128', role: 'img',
       'aria-label': cogs.slices.map(function (s) { return s.label + ' ' + pct(s.pct); }).join(', ') });
     var g = svgEl('g', { transform: 'rotate(-90 60 60)', fill: 'none', 'stroke-width': '22' });
     var C = 2 * Math.PI * 50;
