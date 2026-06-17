@@ -92,7 +92,44 @@ export const DEFAULT_FINANCIALS = {
       { label: 'Volume (cases)', value: '5,000 → 80,000' },
     ],
   },
+  // Shown PUBLICLY on the homepage investor teaser. Stats with a `link`
+  // mirror the (gated) deck so they stay in sync; `custom` stats and the
+  // use-of-capital breakdown are homepage-only and edited in the dashboard.
+  publicTeaser: {
+    stats: [
+      { label: 'Gross margin at launch', link: 'marginLaunch' },
+      { label: '4-pack at shelf', link: 'retail' },
+      { label: 'Margin path within 3 yrs', value: '68–70%', link: '' },
+    ],
+    useOfCapital: {
+      title: 'Use of capital',
+      slices: [
+        { label: 'Production & dry goods', pct: 30.0 },
+        { label: 'Sales & trade tools', pct: 30.0 },
+        { label: 'Marketing', pct: 20.0 },
+        { label: 'Wine & flavor', pct: 20.0 },
+      ],
+    },
+  },
 };
+
+// Public-safe projection of the doc: ONLY the homepage teaser. Linked stats
+// derive their value from the deck so a deck edit flows through automatically.
+export function computePublicTeaser(doc: any) {
+  const pt = doc?.publicTeaser ?? DEFAULT_FINANCIALS.publicTeaser;
+  const launchMargin = doc?.years?.items?.[0]?.marginPct;
+  const retail = doc?.waterfall?.retailPrice;
+  const fmtPct = (n: number) => (Number.isFinite(n) ? n.toFixed(1) + '%' : '—');
+  const fmtMoney = (n: number) => (Number.isFinite(n) ? '$' + n.toFixed(2) : '—');
+  const stats = (pt.stats ?? []).map((s: any) => {
+    let value = s.value ?? '';
+    if (s.link === 'marginLaunch') value = fmtPct(launchMargin);
+    else if (s.link === 'retail') value = fmtMoney(retail);
+    return { label: s.label ?? '', value };
+  });
+  const uoc = pt.useOfCapital ?? { title: 'Use of capital', slices: [] };
+  return { stats, useOfCapital: { title: uoc.title ?? 'Use of capital', slices: uoc.slices ?? [] } };
+}
 
 export function buildCodeEmail(name: string, email: string, code: string) {
   const first = (name || '').trim().split(/\s+/)[0] || 'there';

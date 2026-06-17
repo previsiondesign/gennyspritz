@@ -4,6 +4,31 @@
 body { background: var(--linen); }
 .ad-wrap { width: 100%; max-width: 1040px; margin: 0 auto; padding: 0 24px; }
 
+/* financials sub-headings + public homepage-teaser editor */
+.ad-block-h { font-family: var(--font-head); font-size: 1.15rem; color: var(--forest);
+  margin: 6px 0 2px; display: flex; align-items: center; gap: 10px; }
+.ad-block-gated { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--line); }
+.ad-pt-mount { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 10px 0 4px; }
+.ad-pt-card { background: var(--cream); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+.ad-pt-card-h { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  font-family: var(--font-label); text-transform: uppercase; letter-spacing: .08em;
+  font-size: .72rem; color: var(--muted); margin-bottom: 10px; }
+.ad-pt-card-h .fin-edit-btn { position: static; }
+.ad-pt-list { list-style: none; margin: 0; padding: 0; }
+.ad-pt-list li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0;
+  border-bottom: 1px dashed var(--line); font-size: .9rem; color: #45433d; }
+.ad-pt-list li:last-child { border-bottom: 0; }
+.ad-pt-list b { font-family: var(--font-label); font-weight: 600; color: var(--forest); white-space: nowrap; }
+.ad-pt-list b.ad-pt-auto { color: var(--sage-deep); font-style: italic; font-weight: 500; }
+.ad-pt-label { min-width: 0; }
+
+/* <select> + stat-row grid inside the edit dialog */
+.fe-row select { padding: 9px 10px; border: 1px solid var(--line); border-radius: 5px; background: #fff;
+  font-family: var(--font-body); font-size: .9rem; }
+.fe-row.fe-pubstat { grid-template-columns: 1.3fr 1.1fr 1.4fr; }
+.finm-head.fe-pubstat { display: grid; grid-template-columns: 1.3fr 1.1fr 1.4fr; gap: 8px; }
+.fe-pubstat .fe-end { gap: 6px; }
+
 .ad-header { background: var(--forest); color: #eef1ea; padding: 16px 0; }
 .ad-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .ad-brand { font-size: 1.6rem; color: #fff; margin-right: 14px; }

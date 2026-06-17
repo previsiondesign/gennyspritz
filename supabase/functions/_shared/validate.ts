@@ -82,6 +82,15 @@ export function validFinancials(d: any): boolean {
       if (!strOk(d.assumptions.title) || !listOk(d.assumptions.rows, 24)) return false;
       for (const r of d.assumptions.rows) if (!strOk(r.label) || !strOk(r.value)) return false;
     }
+    if (d.publicTeaser) {
+      const pt = d.publicTeaser;
+      if (!listOk(pt.stats, 6)) return false;
+      for (const s of pt.stats) {
+        if (!strOk(s.label, 80) || !strOk(s.value ?? '', 40) || !strOk(s.link ?? '', 20)) return false;
+      }
+      if (!pt.useOfCapital || !strOk(pt.useOfCapital.title) || !listOk(pt.useOfCapital.slices, 12)) return false;
+      for (const sl of pt.useOfCapital.slices) if (!strOk(sl.label) || !finite(sl.pct)) return false;
+    }
     return true;
   } catch {
     return false;

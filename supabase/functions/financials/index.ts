@@ -5,11 +5,19 @@ import { preflight, json } from '../_shared/cors.ts';
 import { db, delay } from '../_shared/db.ts';
 import { readJson, normEmail } from '../_shared/validate.ts';
 import { codesMatch } from '../_shared/codes.ts';
-import { DEFAULT_FINANCIALS } from '../_shared/defaults.ts';
+import { DEFAULT_FINANCIALS, computePublicTeaser } from '../_shared/defaults.ts';
 
 Deno.serve(async (req) => {
   const pf = preflight(req);
   if (pf) return pf;
+
+  // Public, no-auth: ONLY the homepage teaser (linked stats + use of capital).
+  // Never returns the confidential deck. Powers the main-site investor strip.
+  if (req.method === 'GET') {
+    const { data } = await db().from('financials').select('doc').eq('id', 1).maybeSingle();
+    return json(req, 200, { ok: true, teaser: computePublicTeaser(data?.doc ?? DEFAULT_FINANCIALS) });
+  }
+
   if (req.method !== 'POST') return json(req, 405, { ok: false, reason: 'method' });
 
   const body = await readJson(req);

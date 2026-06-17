@@ -381,6 +381,73 @@
     var mount = $('fin-preview');
     mount.innerHTML = '';
     mount.appendChild(window.renderFinancials(state.finDoc, { onEdit: openEditor }));
+    renderPublicTeaser();
+  }
+
+  var DEFAULT_PT = function () {
+    return {
+      stats: [
+        { label: 'Gross margin at launch', link: 'marginLaunch' },
+        { label: '4-pack at shelf', link: 'retail' },
+        { label: 'Margin path within 3 yrs', value: '68–70%', link: '' },
+      ],
+      useOfCapital: { title: 'Use of capital', slices: [
+        { label: 'Production & dry goods', pct: 30 }, { label: 'Sales & trade tools', pct: 30 },
+        { label: 'Marketing', pct: 20 }, { label: 'Wine & flavor', pct: 20 } ] },
+    };
+  };
+  function pubTeaser() {
+    if (!state.finDoc.publicTeaser) state.finDoc.publicTeaser = DEFAULT_PT();
+    return state.finDoc.publicTeaser;
+  }
+  function ptPencil(section, label) {
+    var b = el('button', 'fin-edit-btn');
+    b.type = 'button';
+    b.setAttribute('aria-label', 'Edit ' + label); b.title = 'Edit ' + label;
+    b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+      'stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>';
+    b.addEventListener('click', function () { openEditor(section); });
+    return b;
+  }
+  function ptCard(title, section, label) {
+    var card = el('div', 'ad-pt-card');
+    var head = el('div', 'ad-pt-card-h');
+    head.appendChild(el('span', null, title));
+    head.appendChild(ptPencil(section, label));
+    card.appendChild(head);
+    return card;
+  }
+  function renderPublicTeaser() {
+    var pt = pubTeaser();
+    var mount = $('pt-mount');
+    if (!mount) return;
+    mount.innerHTML = '';
+
+    var sc = ptCard('Headline stats', 'publicStats', 'the homepage stats');
+    var sul = el('ul', 'ad-pt-list');
+    (pt.stats || []).forEach(function (s) {
+      var li = el('li');
+      li.appendChild(el('span', 'ad-pt-label', s.label));
+      var v = s.link === 'marginLaunch' ? 'launch margin · auto'
+            : s.link === 'retail' ? 'retail price · auto'
+            : (s.value || '—');
+      var b = el('b', s.link ? 'ad-pt-auto' : null, v);
+      li.appendChild(b);
+      sul.appendChild(li);
+    });
+    sc.appendChild(sul);
+    mount.appendChild(sc);
+
+    var cc = ptCard((pt.useOfCapital && pt.useOfCapital.title) || 'Use of capital', 'publicUoC', 'the use-of-capital split');
+    var cul = el('ul', 'ad-pt-list');
+    ((pt.useOfCapital && pt.useOfCapital.slices) || []).forEach(function (s) {
+      var li = el('li');
+      li.appendChild(el('span', 'ad-pt-label', s.label));
+      li.appendChild(el('b', null, (Math.round(s.pct * 10) / 10) + '%'));
+      cul.appendChild(li);
+    });
+    cc.appendChild(cul);
+    mount.appendChild(cc);
   }
 
   function numInput(id, value, step) {
@@ -407,6 +474,8 @@
     costCompress: 'Cost compression',
     assumptions: 'Model assumptions',
     caption: 'Caption above the figures',
+    publicStats: 'Homepage stats (public)',
+    publicUoC: 'Use of capital (public)',
   };
   var FIN_SUBS = {
     topStats: 'The stat cards across the top. Tick “tint” to highlight one.',
@@ -419,6 +488,8 @@
     costCompress: 'Cost components per year — drives the stacked bars.',
     assumptions: 'Label / value pairs shown as the assumptions table.',
     caption: 'Shown to investors above the figures (e.g. “As of June 2026”).',
+    publicStats: 'The three stats on the public homepage. Link a stat to the deck to keep it in sync, or set a custom value.',
+    publicUoC: 'The public use-of-capital donut on the homepage. Add or remove categories; aim for ~100%.',
   };
   var editing = null;        // section key while the dialog is open
   var draft = null;          // working copy of the section being edited
@@ -710,13 +781,74 @@
         draft.rows.push({ label: 'New assumption', value: '—' }); rebuild();
       }));
     }
+
+    if (section === 'publicStats') {
+      var head = el('div', 'finm-head fe-pubstat');
+      ['Label', 'Source', 'Value'].forEach(function (h) { head.appendChild(el('span', null, h)); });
+      body.appendChild(head);
+      draft.items.forEach(function (s, k) {
+        var r = el('div', 'fe-row fe-pubstat');
+        r.appendChild(bindText(s, 'label', 'Stat label'));
+        var sel = el('select');
+        [['', 'Custom value'], ['marginLaunch', 'Launch margin (deck)'], ['retail', 'Retail price (deck)']]
+          .forEach(function (o) {
+            var opt = el('option'); opt.value = o[0]; opt.textContent = o[1];
+            if ((s.link || '') === o[0]) opt.selected = true;
+            sel.appendChild(opt);
+          });
+        var valInput = bindText(s, 'value', '68–70%');
+        valInput.disabled = !!s.link;
+        if (s.link) valInput.placeholder = 'auto from deck';
+        sel.addEventListener('change', function () {
+          s.link = sel.value;
+          valInput.disabled = !!sel.value;
+          valInput.placeholder = sel.value ? 'auto from deck' : '68–70%';
+        });
+        r.appendChild(sel);
+        var end = el('span', 'fe-end');
+        end.appendChild(valInput);
+        end.appendChild(removeBtn(draft.items, k, rebuild));
+        r.appendChild(end);
+        body.appendChild(r);
+      });
+      body.appendChild(addBtn('Add stat', function () {
+        draft.items.push({ label: 'New stat', value: '—', link: '' }); rebuild();
+      }));
+    }
+
+    if (section === 'publicUoC') {
+      titleField(body, 'Card heading (e.g. Use of capital)');
+      var hint = el('p', 'fe-hint');
+      var sumHint = function () {
+        var sum = draft.slices.reduce(function (a, s) { return a + s.pct; }, 0);
+        hint.textContent = 'Slices sum to ' + (Math.round(sum * 10) / 10) + '%';
+        hint.className = 'fe-hint' + (Math.abs(sum - 100) > 0.5 ? ' bad' : '');
+      };
+      draft.slices.forEach(function (s, k) {
+        var r = el('div', 'fe-row');
+        r.appendChild(bindText(s, 'label', 'Category'));
+        r.appendChild(bindNum(s, 'pct', '0.1'));
+        var end = el('span', 'fe-end');
+        end.appendChild(el('span', 'fe-unit', '%'));
+        end.appendChild(removeBtn(draft.slices, k, rebuild));
+        r.appendChild(end);
+        body.appendChild(r);
+      });
+      body.appendChild(hint);
+      body.appendChild(addBtn('Add category', function () {
+        draft.slices.push({ label: 'New category', pct: 0 }); rebuild();
+      }));
+      body.addEventListener('input', sumHint);
+      sumHint();
+    }
   }
 
   function openEditor(section) {
     editing = section;
-    draft = section === 'caption'
-      ? { caption: state.finDoc.caption }
-      : clone(state.finDoc[section] || {});
+    if (section === 'caption') draft = { caption: state.finDoc.caption };
+    else if (section === 'publicStats') draft = { items: clone(pubTeaser().stats) };
+    else if (section === 'publicUoC') draft = clone(pubTeaser().useOfCapital);
+    else draft = clone(state.finDoc[section] || {});
     $('finm-title').textContent = FIN_TITLES[section] || 'Edit';
     $('finm-sub').textContent = FIN_SUBS[section] || '';
     $('finm-error').hidden = true;
@@ -735,7 +867,10 @@
   function collectSection(section) {
     var doc = clone(state.finDoc);
     doc.v = 2;
+    if (!doc.publicTeaser) doc.publicTeaser = DEFAULT_PT();
     if (section === 'caption') doc.caption = (draft.caption || '').trim();
+    else if (section === 'publicStats') doc.publicTeaser.stats = clone(draft.items);
+    else if (section === 'publicUoC') doc.publicTeaser.useOfCapital = clone(draft);
     else doc[section] = clone(draft);
     if (section === 'waterfall') {
       var spent = 0;
