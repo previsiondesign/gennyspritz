@@ -56,10 +56,11 @@ section { scroll-margin-top: 78px; }
     var(--linen);
 }
 .hero-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 50px;
-  grid-template-areas: "brand figure" "detail figure"; }
-.hero-brand  { grid-area: brand;  align-self: end; }
-.hero-detail { grid-area: detail; align-self: start; }
-.hero-figure { grid-area: figure; align-self: center; }
+  grid-template-areas: "eyebrow figure" "brand figure" "detail figure"; align-items: center; }
+.hero-eyebrow { grid-area: eyebrow; align-self: end; }
+.hero-brand   { grid-area: brand; }
+.hero-detail  { grid-area: detail; align-self: start; }
+.hero-figure  { grid-area: figure; align-self: center; }
 .hero-word { font-size: 1em; color: var(--ink); line-height: .8; margin: 0; }
 .hero-lockup {   /* the genny size lives here; width = logo width = the centering frame */
   display: inline-block; font-size: clamp(4.2rem, 12vw, 9rem);
@@ -256,8 +257,8 @@ blockquote .q { font-family: var(--font-head); color: var(--sage-deep); font-siz
   body.nav-open { overflow: hidden; }
 
   .hero-grid, .story-grid, .founder-grid, .invest-grid { grid-template-columns: 1fr; gap: 40px; }
-  .hero-grid { grid-template-areas: "brand" "figure" "detail"; }   /* brand, photo, then copy */
-  .hero-brand, .hero-detail, .hero-figure { align-self: auto; }
+  .hero-grid { grid-template-areas: "brand" "figure" "eyebrow" "detail"; }   /* name/tag, photo, then eyebrow + copy */
+  .hero-eyebrow, .hero-brand, .hero-detail, .hero-figure { align-self: auto; }
   .hero { padding: 120px 0 60px; }
   .hero-figure { transform: none; }
   .story-figure { max-width: 360px; }
