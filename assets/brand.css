@@ -72,6 +72,27 @@ p { margin: 0 0 1em; }
   overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
 .wordmark { font-family: var(--font-display); font-weight: 600; letter-spacing: -.02em; }
+
+/* Real genny wordmark — rendered as a recolorable CSS mask so it inherits
+   currentColor in every context (dark on linen headers, cream on the forest
+   footer, etc.). Only the standalone brand lockups are swapped; mid-sentence
+   .wordmark text (pull-quotes) keeps the display font. Logo ratio 3.374:1. */
+.brand.wordmark, .hero-word.wordmark, .foot-word.wordmark,
+.ad-brand.wordmark, .inv-brand.wordmark, .inv-footer .wordmark {
+  display: inline-block;
+  height: .82em;
+  width: 2.77em;                 /* 3.374 × .82 */
+  vertical-align: middle;
+  line-height: 1;
+  letter-spacing: 0;
+  background-color: currentColor;
+  -webkit-mask: url(genny-logo.svg) no-repeat left center / contain;
+          mask: url(genny-logo.svg) no-repeat left center / contain;
+  text-indent: -9999px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.hero-word.wordmark { height: .8em; width: 2.7em; margin-bottom: .12em; }
 .eyebrow {
   font-family: var(--font-label); text-transform: uppercase;
   letter-spacing: .34em; font-size: .72rem; font-weight: 500; color: var(--muted);
