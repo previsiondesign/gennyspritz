@@ -39,7 +39,7 @@
   --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
   --font-head:    'Playfair Display', Georgia, serif;
   --font-label:   'Jost', 'Century Gothic', 'Helvetica Neue', sans-serif;
-  --font-body:    'Lato', 'Helvetica Neue', Arial, sans-serif;
+  --font-body:    'Albert Sans', 'Helvetica Neue', Arial, sans-serif;
 
   --maxw: 1180px;
   --ease: cubic-bezier(.22,.61,.36,1);
@@ -55,7 +55,7 @@ body {
   font-family: var(--font-body);
   color: var(--ink);
   line-height: 1.62;
-  font-weight: 400;
+  font-weight: 300;   /* Albert Sans Light, per the brand 1-pager */
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
