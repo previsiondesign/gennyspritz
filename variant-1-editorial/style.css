@@ -30,6 +30,10 @@ section { scroll-margin-top: 78px; }
 }
 .header-inner { display: flex; align-items: center; justify-content: space-between; }
 .brand { font-size: 1.85rem; color: var(--ink); text-decoration: none; line-height: 1; }
+/* At the top of the homepage the big hero wordmark is already on screen, so
+   the header logo would double up — fade it in only once the user scrolls. */
+.site-header[data-hero-logo] .brand { transition: opacity .35s var(--ease); }
+.site-header[data-hero-logo]:not(.scrolled) .brand { opacity: 0; pointer-events: none; }
 .nav { display: flex; align-items: center; gap: 30px; }
 .nav a {
   font-family: var(--font-label); font-size: .82rem; letter-spacing: .08em;
