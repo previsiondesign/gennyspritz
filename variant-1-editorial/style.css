@@ -56,14 +56,16 @@ section { scroll-margin-top: 78px; }
     var(--linen);
 }
 .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
-.hero-word { font-size: clamp(4.2rem, 12vw, 9rem); color: var(--ink); line-height: .9;
-  margin: .08em 0 0; padding-bottom: .12em; }
-.hero-lockup { display: inline-block; }   /* hugs the logo so the tag can center under it */
+.hero-word { font-size: 1em; color: var(--ink); line-height: .8; margin: 0; }
+.hero-lockup {   /* the genny size lives here; width = logo width = the centering frame */
+  display: inline-block; font-size: clamp(4.2rem, 12vw, 9rem);
+  width: 2.7em; margin: .4rem 0 1.6rem;
+}
 .hero-tag {
   font-family: var(--font-label); text-transform: uppercase;
-  letter-spacing: .3em; text-indent: .3em;   /* indent compensates the trailing track so it truly centers */
-  font-size: clamp(.9rem, 1.7vw, 1.22rem); color: var(--taupe);
-  font-weight: 600; text-align: center; margin: .5em 0 1.2em;
+  letter-spacing: .34em; text-indent: .34em;   /* indent compensates the trailing track so it centers */
+  font-size: .19em; line-height: 1; color: var(--taupe);   /* fixed fraction of the logo → always fits + centers */
+  font-weight: 600; text-align: center; margin: .45em 0 0;
 }
 .hero-lede { font-size: 1.16rem; color: #4a4842; max-width: 46ch; margin-bottom: 1.8em; }
 .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }

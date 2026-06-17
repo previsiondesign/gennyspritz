@@ -92,7 +92,7 @@ p { margin: 0 0 1em; }
   overflow: hidden;
   white-space: nowrap;
 }
-.hero-word.wordmark { height: .8em; width: 2.7em; margin-bottom: .12em; }
+.hero-word.wordmark { display: block; height: .8em; width: 2.7em; margin: 0; }  /* block = no baseline slack under the logo */
 .eyebrow {
   font-family: var(--font-label); text-transform: uppercase;
   letter-spacing: .34em; font-size: .72rem; font-weight: 500; color: var(--muted);
