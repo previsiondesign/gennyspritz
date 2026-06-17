@@ -14,8 +14,10 @@
   var card = document.querySelector('[data-capital-card]');
   if (!row && !card) return;
 
-  var COLORS = ['var(--forest)', 'var(--coral)', 'var(--sage-deep)', 'var(--taupe)',
-                'var(--honeysuckle)', 'var(--rhubarb)', 'var(--cucumber)', '#8da3b8'];
+  // Palette for the use-of-capital donut. NOTE: this sits on the dark forest
+  // investor band, so --forest is deliberately omitted (it vanishes against it).
+  var COLORS = ['var(--honeysuckle)', 'var(--coral)', 'var(--sage-deep)', 'var(--taupe)',
+                'var(--cucumber)', 'var(--rhubarb)', 'var(--sage)', '#c9a96a'];
   var SVGNS = 'http://www.w3.org/2000/svg';
 
   function pct(n) {
