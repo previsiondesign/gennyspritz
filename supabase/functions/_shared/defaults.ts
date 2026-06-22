@@ -169,3 +169,21 @@ natasha@gennyspritz.com
 </div>`;
   return { subject: 'Your private access code for genny financials', body, html };
 }
+
+// Wrap a plaintext internal alert into a simple branded HTML email: paragraphs,
+// any inline URLs auto-linkified, plus an optional "Open dashboard" CTA button.
+export function notifyHtml(message: string, link?: { url: string; label: string }) {
+  const esc = (s: string) =>
+    String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const linkify = (s: string) =>
+    s.replace(/(https?:\/\/[^\s<]+)/g, (u) => `<a href="${u}" style="color:#DB6A4F">${u}</a>`);
+  const blocks = message.split(/\n{2,}/).map((b) =>
+    `<p style="margin:0 0 12px">${linkify(esc(b)).replace(/\n/g, '<br>')}</p>`).join('\n');
+  const button = link
+    ? `<p style="margin:20px 0 0"><a href="${esc(link.url)}" style="display:inline-block;background:#DB6A4F;color:#fff;text-decoration:none;font-weight:600;padding:10px 18px;border-radius:8px">${esc(link.label)}</a></p>`
+    : '';
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5;color:#33322E">
+${blocks}
+${button}
+</div>`;
+}

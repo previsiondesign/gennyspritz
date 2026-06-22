@@ -5,7 +5,7 @@ import { preflight, json } from '../_shared/cors.ts';
 import { db, clientIp, delay } from '../_shared/db.ts';
 import { readJson, normEmail, str, validFinancials } from '../_shared/validate.ts';
 import { generateCode, sha256Hex } from '../_shared/codes.ts';
-import { DEFAULT_FINANCIALS, buildCodeEmail } from '../_shared/defaults.ts';
+import { DEFAULT_FINANCIALS, buildCodeEmail, notifyHtml } from '../_shared/defaults.ts';
 import { sendEmail } from '../_shared/email.ts';
 
 const FAIL_WINDOW_MIN = 10;
@@ -281,10 +281,13 @@ Deno.serve(async (req) => {
         .createSignedUrl(imagePath, 60 * 60 * 24 * 14);
       if (signed?.signedUrl) imageLine = `\nScreenshot (link valid 14 days):\n${signed.signedUrl}\n`;
     }
+    const bugsDash = `${Deno.env.get('SITE_BASE') ?? 'https://gennyspritz.com'}/admin/#bugs-sec`;
+    const bugMsg = `Natasha filed a bug / change request:\n\n${message}\n${imageLine}`;
     const mail = await sendEmail({
       to: Deno.env.get('NOTIFY_BUGS_TO') ?? 'adam@previsiondesign.com',
       subject: `genny dashboard — bug/change request #${bug.id}`,
-      text: `Natasha filed a bug / change request:\n\n${message}\n${imageLine}\nTrack it: ${Deno.env.get('SITE_BASE') ?? 'https://gennyspritz.com'}/admin/#bugs-sec`,
+      text: `${bugMsg}\nTrack it: ${bugsDash}`,
+      html: notifyHtml(bugMsg, { url: bugsDash, label: 'Open dashboard' }),
     });
     return json(req, 200, { ok: true, bug, emailSent: mail.sent });
   }
@@ -305,10 +308,13 @@ Deno.serve(async (req) => {
       .update({ status: newStatus, notes, updated_at: new Date().toISOString() }).eq('id', id);
     if (error) return json(req, 500, { ok: false, reason: 'store' });
     if (newStatus === 'reopened') {
+      const reopenDash = `${Deno.env.get('SITE_BASE') ?? 'https://gennyspritz.com'}/admin/#bugs-sec`;
+      const reopenMsg = `Natasha marked request #${id} as not resolved.\n\nOriginal:\n${bug.message}\n\nHer follow-up:\n${note || '(no detail given)'}`;
       await sendEmail({
         to: Deno.env.get('NOTIFY_BUGS_TO') ?? 'adam@previsiondesign.com',
         subject: `genny dashboard — request #${id} NOT resolved`,
-        text: `Natasha marked request #${id} as not resolved.\n\nOriginal:\n${bug.message}\n\nHer follow-up:\n${note || '(no detail given)'}`,
+        text: reopenMsg,
+        html: notifyHtml(reopenMsg, { url: reopenDash, label: 'Open dashboard' }),
       });
     }
     return json(req, 200, { ok: true });

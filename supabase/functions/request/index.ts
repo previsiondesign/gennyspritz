@@ -4,7 +4,7 @@ import { preflight, json } from '../_shared/cors.ts';
 import { db } from '../_shared/db.ts';
 import { readJson, normEmail, str } from '../_shared/validate.ts';
 import { sendEmail } from '../_shared/email.ts';
-import { SITE_BASE } from '../_shared/defaults.ts';
+import { SITE_BASE, notifyHtml } from '../_shared/defaults.ts';
 
 const NOTIFY_TO = Deno.env.get('NOTIFY_REQUESTS_TO') ?? 'investor-request@gennyspritz.com';
 const NOTIFY_LAUNCH_TO = Deno.env.get('NOTIFY_LAUNCH_TO') ?? NOTIFY_TO;
@@ -36,13 +36,13 @@ Deno.serve(async (req) => {
       .select('id');
     if (error) return json(req, 500, { ok: false, reason: 'store' });
     if (added && added.length) {
+      const launchDash = `${SITE_BASE}/admin/#launch-sec`;
+      const launchMsg = `${email} just joined the genny launch list.`;
       await sendEmail({
         to: NOTIFY_LAUNCH_TO,
         subject: `genny — new launch-list signup: ${email}`,
-        text: `${email} just joined the genny launch list.
-
-See everyone who's signed up:
-${SITE_BASE}/admin/#launch-sec`,
+        text: `${launchMsg}\n\nSee everyone who's signed up:\n${launchDash}`,
+        html: notifyHtml(launchMsg, { url: launchDash, label: 'See the launch list' }),
       });
     }
     return json(req, 200, { ok: true });
@@ -72,21 +72,22 @@ ${SITE_BASE}/admin/#launch-sec`,
   const subject = kind === 'reset'
     ? `genny — code reset request from ${email}`
     : `genny — access request from ${row.name} (${row.firm || 'no firm'})`;
-  const text = kind === 'reset'
-    ? `${row.name ? row.name + ' — ' : ''}${email} lost their access code and asked for a new one.
-
-Review and resend from your dashboard:
-${approveLink}`
+  const msg = kind === 'reset'
+    ? `${row.name ? row.name + ' — ' : ''}${email} lost their access code and asked for a new one.`
     : `New investor access request:
 
 Name:  ${row.name}
 Email: ${email}
 Firm:  ${row.firm || '—'}
-Note:  ${row.note || '—'}
-
-Review and approve from your dashboard:
-${approveLink}`;
-  await sendEmail({ to: NOTIFY_TO, subject, text });
+Note:  ${row.note || '—'}`;
+  const prompt = kind === 'reset'
+    ? 'Review and resend from your dashboard:'
+    : 'Review and approve from your dashboard:';
+  const text = `${msg}\n\n${prompt}\n${approveLink}`;
+  await sendEmail({
+    to: NOTIFY_TO, subject, text,
+    html: notifyHtml(`${msg}\n\n${prompt}`, { url: approveLink, label: 'Open dashboard' }),
+  });
 
   return json(req, 200, { ok: true });
 });
