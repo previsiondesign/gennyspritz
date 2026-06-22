@@ -80,6 +80,7 @@
         state.overview = res.data;
         renderOverview();
         loadFinancials();
+        loadCodeEmail();
       } else if (res.status === 429) {
         lock('Too many failed attempts — wait 10 minutes and try again.');
       } else if (res.status === 0) {
@@ -932,7 +933,7 @@
     if (pass) unlock(pass);
   });
   $('lock').addEventListener('click', function () { lock(); });
-  $('refresh').addEventListener('click', function () { loadOverview(); loadFinancials(); });
+  $('refresh').addEventListener('click', function () { loadOverview(); loadFinancials(); loadCodeEmail(); });
 
   // ---- idle auto sign-out (10 min) ----
   ['pointerdown', 'keydown', 'wheel', 'touchstart', 'mousemove'].forEach(function (ev) {
@@ -971,6 +972,32 @@
           fail('Could not update the passcode — please try again.');
         }
       }).catch(function () {});
+  });
+
+  // ---- investor access email template ----
+  var codeEmailDefault = { subject: '', body: '' };
+  function loadCodeEmail() {
+    return api('/admin/code-email').then(function (res) {
+      if (res.status === 200 && res.data.ok) {
+        codeEmailDefault = res.data.default || codeEmailDefault;
+        $('cm-subject').value = res.data.subject || codeEmailDefault.subject || '';
+        $('cm-body').value = res.data.body || codeEmailDefault.body || '';
+      }
+    }).catch(function () {});
+  }
+  $('codemail-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    $('codemail-error').hidden = true; $('codemail-ok').hidden = true;
+    api('/admin/code-email', { method: 'PUT', body: { subject: $('cm-subject').value, body: $('cm-body').value } })
+      .then(function (res) {
+        if (res.status === 200 && res.data.ok) { $('codemail-ok').hidden = false; }
+        else { $('codemail-error').textContent = 'Could not save — please try again.'; $('codemail-error').hidden = false; }
+      }).catch(function () {});
+  });
+  $('cm-reset').addEventListener('click', function () {
+    $('cm-subject').value = codeEmailDefault.subject || '';
+    $('cm-body').value = codeEmailDefault.body || '';
+    $('codemail-ok').hidden = true; $('codemail-error').hidden = true;
   });
 
   $('add-form').addEventListener('submit', function (e) {

@@ -131,43 +131,62 @@ export function computePublicTeaser(doc: any) {
   return { stats, useOfCapital: { title: uoc.title ?? 'Use of capital', slices: uoc.slices ?? [] } };
 }
 
-export function buildCodeEmail(name: string, email: string, code: string) {
-  const first = (name || '').trim().split(/\s+/)[0] || 'there';
-  const invUrl = `${SITE_BASE}/investors/`;
-  const body =
-`Hi ${first},
+// Default investor access-code email in editable-template form. The dashboard
+// can override subject/body (stored in public.email_template); the placeholders
+// {first_name} {code} {email} {link} are filled in per investor at send time.
+export const DEFAULT_CODE_EMAIL = {
+  subject: 'Your private access code for genny financials',
+  body:
+`Hi {first_name},
 
 Thank you for your interest in genny!
 
 I've granted you access to our financial data. Your personal code is:
 
-${code}
+{code}
 
 View the financials here:
-${invUrl}
+{link}
 
-Sign in with your email (${email}) and the code above.
+Sign in with your email ({email}) and the code above.
 Note: These materials are confidential — please don't forward or share them without permission.
 
 Natasha
 natasha@gennyspritz.com
-(415) 608-8050`;
+(415) 608-8050`,
+};
+
+export function buildCodeEmail(
+  name: string, email: string, code: string,
+  template?: { subject?: string | null; body?: string | null },
+) {
+  const first = (name || '').trim().split(/\s+/)[0] || 'there';
+  const invUrl = `${SITE_BASE}/investors/`;
+  const subject = (template?.subject && template.subject.trim()) ? template.subject : DEFAULT_CODE_EMAIL.subject;
+  const tpl = (template?.body && template.body.trim()) ? template.body : DEFAULT_CODE_EMAIL.body;
   const esc = (s: string) =>
     String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const html =
-`<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;color:#33322E">
-<p>Hi ${esc(first)},</p>
-<p>Thank you for your interest in genny!</p>
-<p>I've granted you access to our financial data. Your personal code is:</p>
-<p style="margin:18px 0"><span style="display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:20px;font-weight:700;letter-spacing:.12em;color:#33322E;background:#F4EFE7;border-radius:8px;padding:10px 16px">${esc(code)}</span></p>
-<p><a href="${invUrl}" style="color:#DB6A4F;font-weight:600;text-decoration:none">View the financials here &rarr;</a></p>
-<p>Sign in with your email (<strong>${esc(email)}</strong>) and the code above.</p>
-<p style="color:#6b6b6b;font-size:13px">These materials are confidential — please don't forward or share them without permission.</p>
-<p style="margin-top:22px">Natasha<br>
-<a href="mailto:natasha@gennyspritz.com" style="color:#DB6A4F;text-decoration:none">natasha@gennyspritz.com</a><br>
-(415) 608-8050</p>
+
+  // Plain-text version: straight placeholder substitution.
+  const body = tpl
+    .replace(/\{first_name\}/g, first)
+    .replace(/\{code\}/g, code)
+    .replace(/\{email\}/g, email)
+    .replace(/\{link\}/g, invUrl);
+
+  // HTML version: escape the (user-editable) template first, then swap the
+  // placeholders for trusted styled markup — the code pill and a real link.
+  const codePill = `<span style="display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:20px;font-weight:700;letter-spacing:.12em;color:#33322E;background:#F4EFE7;border-radius:8px;padding:8px 14px">${esc(code)}</span>`;
+  const linkA = `<a href="${invUrl}" style="color:#DB6A4F;font-weight:600;text-decoration:none">${invUrl}</a>`;
+  const htmlInner = esc(tpl)
+    .replace(/\{first_name\}/g, esc(first))
+    .replace(/\{email\}/g, esc(email))
+    .replace(/\{code\}/g, codePill)
+    .replace(/\{link\}/g, linkA);
+  const html = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;color:#33322E">
+${htmlInner.split(/\n{2,}/).map((b) => `<p style="margin:0 0 12px">${b.replace(/\n/g, '<br>')}</p>`).join('\n')}
 </div>`;
-  return { subject: 'Your private access code for genny financials', body, html };
+  return { subject, body, html };
 }
 
 // Wrap a plaintext internal alert into a simple branded HTML email: paragraphs,

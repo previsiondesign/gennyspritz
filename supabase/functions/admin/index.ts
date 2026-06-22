@@ -5,7 +5,7 @@ import { preflight, json } from '../_shared/cors.ts';
 import { db, clientIp, delay } from '../_shared/db.ts';
 import { readJson, normEmail, str, validFinancials } from '../_shared/validate.ts';
 import { generateCode, sha256Hex } from '../_shared/codes.ts';
-import { DEFAULT_FINANCIALS, buildCodeEmail, notifyHtml } from '../_shared/defaults.ts';
+import { DEFAULT_FINANCIALS, buildCodeEmail, notifyHtml, DEFAULT_CODE_EMAIL } from '../_shared/defaults.ts';
 import { sendEmail } from '../_shared/email.ts';
 
 const FAIL_WINDOW_MIN = 10;
@@ -22,6 +22,13 @@ async function sendCodeEmail(to: string, draft: { subject: string; body: string;
     to, from: CODE_FROM, replyTo: CODE_REPLY_TO, bcc: CODE_BCC,
     subject: draft.subject, text: draft.body, html: draft.html,
   });
+}
+
+// The investor code email is editable from the dashboard (public.email_template);
+// a missing table/row just falls back to the built-in default in buildCodeEmail.
+async function loadCodeTemplate(supa: ReturnType<typeof db>) {
+  const { data } = await supa.from('email_template').select('subject,body').eq('id', 1).maybeSingle();
+  return { subject: data?.subject ?? null, body: data?.body ?? null };
 }
 
 // Stored passcode hash: DB row wins (changeable from the dashboard);
@@ -128,6 +135,29 @@ Deno.serve(async (req) => {
     return json(req, 200, { ok: true });
   }
 
+  // ---------- investor code-email template (view / edit) ----------
+  if (action === 'code-email' && req.method === 'GET') {
+    const { data } = await supa.from('email_template').select('subject,body').eq('id', 1).maybeSingle();
+    return json(req, 200, {
+      ok: true,
+      subject: data?.subject ?? '',
+      body: data?.body ?? '',
+      default: DEFAULT_CODE_EMAIL,
+    });
+  }
+  if (action === 'code-email' && req.method === 'PUT') {
+    const b = await readJson(req);
+    if (!b) return json(req, 400, { ok: false, reason: 'bad-json' });
+    const { error } = await supa.from('email_template').upsert({
+      id: 1,
+      subject: str(b.subject, 200) || null,
+      body: str(b.body, 6000) || null,
+      updated_at: new Date().toISOString(),
+    });
+    if (error) return json(req, 500, { ok: false, reason: 'store' });
+    return json(req, 200, { ok: true });
+  }
+
   if (req.method !== 'POST') return json(req, 405, { ok: false, reason: 'method' });
   const body = await readJson(req);
   if (!body) return json(req, 400, { ok: false, reason: 'bad-json' });
@@ -170,7 +200,7 @@ Deno.serve(async (req) => {
     }
     // Auto-send the code to the investor. If Resend isn't configured or the
     // send fails, the dashboard falls back to the returned draft.
-    const draft = buildCodeEmail(name, email, code);
+    const draft = buildCodeEmail(name, email, code, await loadCodeTemplate(supa));
     const mail = await sendCodeEmail(email, draft);
     if (mail.sent) {
       await supa.from('investors')
@@ -206,7 +236,7 @@ Deno.serve(async (req) => {
     const { error } = await supa.from('investors')
       .update({ code, updated_at: new Date().toISOString(), code_emailed_at: null }).eq('email', email);
     if (error) return json(req, 500, { ok: false, reason: 'store' });
-    const draft = buildCodeEmail(inv.name, email, code);
+    const draft = buildCodeEmail(inv.name, email, code, await loadCodeTemplate(supa));
     const mail = await sendCodeEmail(email, draft);
     if (mail.sent) {
       await supa.from('investors')

@@ -156,6 +156,25 @@
           <button type="submit" class="btn btn-coral">Update passcode</button>
         </form>
       </div>
+      <div class="ad-card ad-settings">
+        <h3 class="ad-settings-h">Investor access email</h3>
+        <p class="ad-sub">The email investors receive with their access code. These placeholders fill in
+          automatically per person: <code>{first_name}</code> · <code>{code}</code> ·
+          <code>{email}</code> · <code>{link}</code> (the sign-in page). Write plain text — the link and
+          code are styled for you.</p>
+        <form id="codemail-form" novalidate>
+          <label for="cm-subject">Subject</label>
+          <input id="cm-subject" type="text" style="width:100%;box-sizing:border-box" />
+          <label for="cm-body">Body</label>
+          <textarea id="cm-body" rows="14" style="width:100%;box-sizing:border-box;font-family:inherit"></textarea>
+          <p class="inv-error" id="codemail-error" hidden></p>
+          <p class="ad-saved" id="codemail-ok" hidden>✓ Saved — new access codes will use this email.</p>
+          <div class="ad-row-actions" style="margin-top:12px">
+            <button type="submit" class="btn btn-coral">Save email</button>
+            <button type="button" class="btn btn-ghost" id="cm-reset">Reset to default</button>
+          </div>
+        </form>
+      </div>
     </section>
 
   </div>
