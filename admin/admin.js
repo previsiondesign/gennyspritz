@@ -999,6 +999,20 @@
     $('cm-body').value = codeEmailDefault.body || '';
     $('codemail-ok').hidden = true; $('codemail-error').hidden = true;
   });
+  $('cm-preview-btn').addEventListener('click', function () {
+    api('/admin/code-email-preview', { method: 'POST', body: { subject: $('cm-subject').value, body: $('cm-body').value } })
+      .then(function (res) {
+        if (res.status === 200 && res.data.ok) {
+          $('cm-preview-subject').textContent = res.data.subject || '';
+          $('cm-preview-frame').srcdoc = res.data.html || '';
+          $('cm-preview').style.display = 'flex';
+        }
+      }).catch(function () {});
+  });
+  $('cm-preview-close').addEventListener('click', function () { $('cm-preview').style.display = 'none'; });
+  $('cm-preview').addEventListener('click', function (e) {
+    if (e.target === $('cm-preview')) $('cm-preview').style.display = 'none';
+  });
 
   $('add-form').addEventListener('submit', function (e) {
     e.preventDefault();

@@ -161,6 +161,13 @@ Deno.serve(async (req) => {
   const body = await readJson(req);
   if (!body) return json(req, 400, { ok: false, reason: 'bad-json' });
 
+  // ---------- code-email preview (render the draft with dummy values) ----------
+  if (action === 'code-email-preview') {
+    const draft = buildCodeEmail('Alex Investor', 'alex@example.com', 'GS-AB12-CD34',
+      { subject: str(body.subject, 200), body: str(body.body, 6000) });
+    return json(req, 200, { ok: true, subject: draft.subject, html: draft.html });
+  }
+
   // ---------- grant (by requestId, or manual email/name) ----------
   if (action === 'grant') {
     let email: string | null, name = '', firm = '';
