@@ -260,9 +260,16 @@
     if (r.type === 'reset') nameLine.appendChild(el('span', 'ad-pill reset', 'code reset'));
     if (r.investorStatus === 'active') nameLine.appendChild(el('span', 'ad-pill ghost', 'already has access'));
     if (r.investorStatus === 'revoked') nameLine.appendChild(el('span', 'ad-pill revoked', 'was revoked'));
+    if (r.investorStatus === 'removed') nameLine.appendChild(el('span', 'ad-pill revoked', 'removed'));
     if (r.type === 'reset' && !r.known_investor) nameLine.appendChild(el('span', 'ad-pill warn', 'no matching investor'));
     main.appendChild(nameLine);
     main.appendChild(el('div', 'ad-row-meta', r.email + (r.firm ? ' · ' + r.firm : '') + ' · ' + fmt(r.created_at, true)));
+    if (r.investorRevokedAt || r.investorRemovedAt) {
+      var fateParts = [];
+      if (r.investorRevokedAt) fateParts.push('access revoked ' + fmt(r.investorRevokedAt, true));
+      if (r.investorRemovedAt) fateParts.push('removed ' + fmt(r.investorRemovedAt, true));
+      main.appendChild(el('div', 'ad-row-meta', fateParts.join(' · ')));
+    }
     if (r.note) main.appendChild(el('div', 'ad-row-note', '“' + r.note + '”'));
     row.appendChild(main);
 

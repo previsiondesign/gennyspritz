@@ -96,18 +96,28 @@ Deno.serve(async (req) => {
     ]);
     const byEmail: Record<string, string[]> = {};
     for (const v of views ?? []) (byEmail[v.email] ??= []).push(v.viewed_at);
-    const inv = (investors ?? []).map((i) => ({
+    const allInv = (investors ?? []).map((i) => ({
       ...i,
       viewCount: byEmail[i.email]?.length ?? 0,
       lastViewAt: byEmail[i.email]?.[0] ?? null,
       views: byEmail[i.email] ?? [],
     }));
-    const status: Record<string, string> = {};
-    for (const i of inv) status[i.email] = i.status;
-    const reqs = (requests ?? []).map((r) => ({
-      ...r,
-      investorStatus: status[r.email] ?? 'none',
-    }));
+    // The Investors list hides soft-removed investors; their fate still shows
+    // on the matching handled request below.
+    const inv = allInv.filter((i) => !i.removed_at);
+    const fate: Record<string, { status: string; revoked_at: string | null; removed_at: string | null }> = {};
+    for (const i of allInv) {
+      fate[i.email] = { status: i.status, revoked_at: i.revoked_at ?? null, removed_at: i.removed_at ?? null };
+    }
+    const reqs = (requests ?? []).map((r) => {
+      const f = fate[r.email];
+      return {
+        ...r,
+        investorStatus: f ? (f.removed_at ? 'removed' : f.status) : 'none',
+        investorRevokedAt: f?.revoked_at ?? null,
+        investorRemovedAt: f?.removed_at ?? null,
+      };
+    });
     return json(req, 200, {
       ok: true, requests: reqs, investors: inv,
       launchList: launchList ?? [], bugs: bugs ?? [],
@@ -201,6 +211,8 @@ Deno.serve(async (req) => {
       code_emailed_at: sameCode ? (existing?.code_emailed_at ?? null) : null,
     });
     if (error) return json(req, 500, { ok: false, reason: 'store' });
+    // (re-)granting un-removes a previously soft-deleted investor (ignored if not migrated).
+    await supa.from('investors').update({ removed_at: null }).eq('email', email);
     if (requestId) {
       await supa.from('requests').update({ status: 'granted', handled_at: now }).eq('id', requestId);
     }
@@ -231,16 +243,25 @@ Deno.serve(async (req) => {
     return json(req, 200, { ok: true });
   }
 
-  // ---------- remove (delete a REVOKED investor + their view history) ----------
+  // ---------- remove (soft-delete a REVOKED investor; keeps request history) ----------
   if (action === 'remove') {
     const email = normEmail(body.email);
     if (!email) return json(req, 400, { ok: false, reason: 'bad-email' });
     const { data: inv } = await supa.from('investors').select('status').eq('email', email).maybeSingle();
     if (!inv) return json(req, 404, { ok: false, reason: 'no-investor' });
     if (inv.status !== 'revoked') return json(req, 409, { ok: false, reason: 'not-revoked' });
-    await supa.from('views').delete().eq('email', email);
-    const { error } = await supa.from('investors').delete().eq('email', email);
-    if (error) return json(req, 500, { ok: false, reason: 'store' });
+    const now = new Date().toISOString();
+    const { error } = await supa.from('investors')
+      .update({ removed_at: now, updated_at: now }).eq('email', email);
+    if (error) {
+      // removed_at column not migrated yet → fall back to the old hard delete
+      if (error.code === '42703' || /removed_at/.test(error.message ?? '')) {
+        await supa.from('views').delete().eq('email', email);
+        await supa.from('investors').delete().eq('email', email);
+      } else {
+        return json(req, 500, { ok: false, reason: 'store' });
+      }
+    }
     return json(req, 200, { ok: true });
   }
 
