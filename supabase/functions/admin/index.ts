@@ -12,14 +12,13 @@ const FAIL_WINDOW_MIN = 10;
 const FAIL_LIMIT = 20;
 
 // Investor access-code emails go out AS Natasha (verified gennyspritz.com
-// sender via Resend), with replies routed to her and a copy BCC'd to her.
+// sender via Resend), with replies routed to her.
 const CODE_FROM = 'Natasha Hayes <natasha@gennyspritz.com>';
 const CODE_REPLY_TO = 'natasha@gennyspritz.com';
-const CODE_BCC = 'natasha@gennyspritz.com';
 
 async function sendCodeEmail(to: string, draft: { subject: string; body: string; html: string }) {
   return await sendEmail({
-    to, from: CODE_FROM, replyTo: CODE_REPLY_TO, bcc: CODE_BCC,
+    to, from: CODE_FROM, replyTo: CODE_REPLY_TO,
     subject: draft.subject, text: draft.body, html: draft.html,
   });
 }
