@@ -231,6 +231,19 @@ Deno.serve(async (req) => {
     return json(req, 200, { ok: true });
   }
 
+  // ---------- remove (delete a REVOKED investor + their view history) ----------
+  if (action === 'remove') {
+    const email = normEmail(body.email);
+    if (!email) return json(req, 400, { ok: false, reason: 'bad-email' });
+    const { data: inv } = await supa.from('investors').select('status').eq('email', email).maybeSingle();
+    if (!inv) return json(req, 404, { ok: false, reason: 'no-investor' });
+    if (inv.status !== 'revoked') return json(req, 409, { ok: false, reason: 'not-revoked' });
+    await supa.from('views').delete().eq('email', email);
+    const { error } = await supa.from('investors').delete().eq('email', email);
+    if (error) return json(req, 500, { ok: false, reason: 'store' });
+    return json(req, 200, { ok: true });
+  }
+
   // ---------- regenerate (active investors only) ----------
   if (action === 'regenerate') {
     const email = normEmail(body.email);

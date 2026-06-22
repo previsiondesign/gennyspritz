@@ -368,6 +368,10 @@
             }
           }).catch(function () {});
       }));
+      actions.appendChild(btn('danger', 'Remove', function () {
+        if (!confirm('Remove ' + i.email + " from the list? This permanently deletes them and their view history. They're already revoked, so access stays blocked.")) return;
+        api('/admin/remove', { method: 'POST', body: { email: i.email } }).then(loadOverview).catch(function () {});
+      }));
     }
     row.appendChild(actions);
     return row;
