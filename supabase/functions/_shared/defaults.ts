@@ -133,9 +133,8 @@ export function computePublicTeaser(doc: any) {
 
 export function buildCodeEmail(name: string, email: string, code: string) {
   const first = (name || '').trim().split(/\s+/)[0] || 'there';
-  return {
-    subject: 'Your private access code for genny financials',
-    body:
+  const invUrl = `${SITE_BASE}/investors/`;
+  const body =
 `Hi ${first},
 
 Thank you for your interest in genny!
@@ -145,13 +144,28 @@ I've granted you access to our financial data. Your personal code is:
 ${code}
 
 View the financials here:
-${SITE_BASE}/investors/
+${invUrl}
 
 Sign in with your email (${email}) and the code above.
 Note: These materials are confidential — please don't forward or share them without permission.
 
 Natasha
 natasha@gennyspritz.com
-(415) 608-8050`,
-  };
+(415) 608-8050`;
+  const esc = (s: string) =>
+    String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const html =
+`<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;color:#33322E">
+<p>Hi ${esc(first)},</p>
+<p>Thank you for your interest in genny!</p>
+<p>I've granted you access to our financial data. Your personal code is:</p>
+<p style="margin:18px 0"><span style="display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:20px;font-weight:700;letter-spacing:.12em;color:#33322E;background:#F4EFE7;border-radius:8px;padding:10px 16px">${esc(code)}</span></p>
+<p><a href="${invUrl}" style="color:#DB6A4F;font-weight:600;text-decoration:none">View the financials here &rarr;</a></p>
+<p>Sign in with your email (<strong>${esc(email)}</strong>) and the code above.</p>
+<p style="color:#6b6b6b;font-size:13px">These materials are confidential — please don't forward or share them without permission.</p>
+<p style="margin-top:22px">Natasha<br>
+<a href="mailto:natasha@gennyspritz.com" style="color:#DB6A4F;text-decoration:none">natasha@gennyspritz.com</a><br>
+(415) 608-8050</p>
+</div>`;
+  return { subject: 'Your private access code for genny financials', body, html };
 }

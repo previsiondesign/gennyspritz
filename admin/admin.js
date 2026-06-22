@@ -120,6 +120,19 @@
     return api('/admin/mark-emailed', { method: 'POST', body: { email: email } }).catch(function () {});
   }
 
+  // After grant/regenerate the backend emails the code as Natasha. If that
+  // send failed (or Resend is off), fall back to opening a local draft.
+  function deliverCode(email, res) {
+    if (res.data.emailSent) {
+      alert('✓ Access code emailed to ' + email + '.');
+      loadOverview();
+    } else {
+      alert("Couldn't auto-send — opening a draft you can send manually.");
+      mailtoDraft(email, res.data.emailDraft);
+      markEmailed(email).then(loadOverview);
+    }
+  }
+
   function copyable(code) {
     var c = el('span', 'ad-code', code);
     c.title = 'Click to copy';
@@ -263,8 +276,7 @@
             if (r.type === 'reset' && r.investorStatus === 'active') {
               api('/admin/dismiss', { method: 'POST', body: { requestId: r.id } });
             }
-            mailtoDraft(r.email, res.data.emailDraft);
-            markEmailed(r.email).then(loadOverview);
+            deliverCode(r.email, res);
           } else {
             alert('Could not grant: ' + (res.data && res.data.reason || 'error'));
           }
@@ -336,8 +348,11 @@
         }));
       }
       actions.appendChild(btn('quiet', 'New code', function () {
-        if (!confirm('Generate a NEW code for ' + i.email + '? The old code stops working, and you can email the new one with Draft email.')) return;
-        api('/admin/regenerate', { method: 'POST', body: { email: i.email } }).then(loadOverview).catch(function () {});
+        if (!confirm('Generate a NEW code for ' + i.email + '? The old code stops working and the new one is emailed to them automatically.')) return;
+        api('/admin/regenerate', { method: 'POST', body: { email: i.email } }).then(function (res) {
+          if (res.status === 200 && res.data.ok) deliverCode(i.email, res);
+          else loadOverview();
+        }).catch(function () {});
       }));
       actions.appendChild(btn('danger', 'Revoke', function () {
         if (!confirm('Revoke access for ' + i.email + '? They are blocked immediately.')) return;
@@ -348,8 +363,7 @@
         api('/admin/grant', { method: 'POST', body: { email: i.email, name: i.name, firm: i.firm } })
           .then(function (res) {
             if (res.status === 200 && res.data.ok) {
-              mailtoDraft(i.email, res.data.emailDraft);
-              markEmailed(i.email).then(loadOverview);
+              deliverCode(i.email, res);
             }
           }).catch(function () {});
       }));
@@ -967,8 +981,7 @@
     api('/admin/grant', { method: 'POST', body: { email: email, name: name, firm: firm } }).then(function (res) {
       if (res.status === 200 && res.data.ok) {
         $('add-name').value = ''; $('add-email').value = ''; $('add-firm').value = '';
-        mailtoDraft(email, res.data.emailDraft);
-        markEmailed(email).then(loadOverview);
+        deliverCode(email, res);
       } else {
         $('add-error').textContent = 'Could not add: ' + (res.data && res.data.reason || 'error');
         $('add-error').hidden = false;

@@ -11,6 +11,19 @@ import { sendEmail } from '../_shared/email.ts';
 const FAIL_WINDOW_MIN = 10;
 const FAIL_LIMIT = 20;
 
+// Investor access-code emails go out AS Natasha (verified gennyspritz.com
+// sender via Resend), with replies routed to her and a copy BCC'd to her.
+const CODE_FROM = 'Natasha Hayes <natasha@gennyspritz.com>';
+const CODE_REPLY_TO = 'natasha@gennyspritz.com';
+const CODE_BCC = 'natasha@gennyspritz.com';
+
+async function sendCodeEmail(to: string, draft: { subject: string; body: string; html: string }) {
+  return await sendEmail({
+    to, from: CODE_FROM, replyTo: CODE_REPLY_TO, bcc: CODE_BCC,
+    subject: draft.subject, text: draft.body, html: draft.html,
+  });
+}
+
 // Stored passcode hash: DB row wins (changeable from the dashboard);
 // the ADMIN_PASSCODE env secret is only a bootstrap fallback.
 async function storedPasscodeHash(supa: ReturnType<typeof db>): Promise<string | null> {
@@ -155,10 +168,19 @@ Deno.serve(async (req) => {
     if (requestId) {
       await supa.from('requests').update({ status: 'granted', handled_at: now }).eq('id', requestId);
     }
+    // Auto-send the code to the investor. If Resend isn't configured or the
+    // send fails, the dashboard falls back to the returned draft.
+    const draft = buildCodeEmail(name, email, code);
+    const mail = await sendCodeEmail(email, draft);
+    if (mail.sent) {
+      await supa.from('investors')
+        .update({ code_emailed_at: new Date().toISOString() }).eq('email', email);
+    }
     return json(req, 200, {
       ok: true,
       investor: { email, name, code },
-      emailDraft: buildCodeEmail(name, email, code),
+      emailSent: mail.sent,
+      emailDraft: draft,
     });
   }
 
@@ -184,10 +206,13 @@ Deno.serve(async (req) => {
     const { error } = await supa.from('investors')
       .update({ code, updated_at: new Date().toISOString(), code_emailed_at: null }).eq('email', email);
     if (error) return json(req, 500, { ok: false, reason: 'store' });
-    return json(req, 200, {
-      ok: true, code,
-      emailDraft: buildCodeEmail(inv.name, email, code),
-    });
+    const draft = buildCodeEmail(inv.name, email, code);
+    const mail = await sendCodeEmail(email, draft);
+    if (mail.sent) {
+      await supa.from('investors')
+        .update({ code_emailed_at: new Date().toISOString() }).eq('email', email);
+    }
+    return json(req, 200, { ok: true, code, emailSent: mail.sent, emailDraft: draft });
   }
 
   // ---------- mark the current code's email as drafted ----------
