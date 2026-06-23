@@ -175,6 +175,18 @@ Deno.serve(async (req) => {
     return json(req, 200, { ok: true, signedUrl: data.signedUrl });
   }
 
+  // ---------- current pitch-deck info (filename + open link) ----------
+  if (action === 'deck-info' && req.method === 'GET') {
+    const { data: meta } = await supa.from('deck_meta')
+      .select('filename,uploaded_at').eq('id', 1).maybeSingle();
+    let url: string | null = null;
+    try {
+      const { data: signed } = await supa.storage.from('deck').createSignedUrl('current.pdf', 3600);
+      if (signed?.signedUrl) url = signed.signedUrl;
+    } catch { /* no deck */ }
+    return json(req, 200, { ok: true, filename: meta?.filename ?? null, uploadedAt: meta?.uploaded_at ?? null, url });
+  }
+
   if (req.method !== 'POST') return json(req, 405, { ok: false, reason: 'method' });
   const body = await readJson(req);
   if (!body) return json(req, 400, { ok: false, reason: 'bad-json' });
@@ -184,6 +196,15 @@ Deno.serve(async (req) => {
     const draft = buildCodeEmail('Alex Investor', 'alex@example.com', 'GS-AB12-CD34',
       { subject: str(body.subject, 200), body: str(body.body, 6000) });
     return json(req, 200, { ok: true, subject: draft.subject, html: draft.html });
+  }
+
+  // ---------- record the uploaded pitch-deck's original filename ----------
+  if (action === 'deck-saved') {
+    const filename = str(body.filename, 200) || 'pitch-deck.pdf';
+    const { error } = await supa.from('deck_meta')
+      .upsert({ id: 1, filename, uploaded_at: new Date().toISOString() });
+    if (error) return json(req, 500, { ok: false, reason: 'store' });
+    return json(req, 200, { ok: true });
   }
 
   // ---------- grant (by requestId, or manual email/name) ----------

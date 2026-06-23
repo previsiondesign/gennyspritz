@@ -81,6 +81,7 @@
         renderOverview();
         loadFinancials();
         loadCodeEmail();
+        loadDeckInfo();
       } else if (res.status === 429) {
         lock('Too many failed attempts — wait 10 minutes and try again.');
       } else if (res.status === 0) {
@@ -944,7 +945,7 @@
     if (pass) unlock(pass);
   });
   $('lock').addEventListener('click', function () { lock(); });
-  $('refresh').addEventListener('click', function () { loadOverview(); loadFinancials(); loadCodeEmail(); });
+  $('refresh').addEventListener('click', function () { loadOverview(); loadFinancials(); loadCodeEmail(); loadDeckInfo(); });
 
   // ---- idle auto sign-out (10 min) ----
   ['pointerdown', 'keydown', 'wheel', 'touchstart', 'mousemove'].forEach(function (ev) {
@@ -1025,24 +1026,43 @@
     if (e.target === $('cm-preview')) $('cm-preview').style.display = 'none';
   });
 
-  // ---- pitch deck upload (signed URL → direct PUT to storage) ----
+  // ---- pitch deck: show current + upload (signed URL → direct PUT to storage) ----
+  function loadDeckInfo() {
+    return api('/admin/deck-info').then(function (res) {
+      var el = $('deck-current');
+      if (!el) return;
+      el.textContent = '';
+      if (res.status === 200 && res.data && res.data.ok && res.data.url) {
+        el.appendChild(document.createTextNode('Current: ' + (res.data.filename || 'pitch deck (PDF)')));
+        if (res.data.uploadedAt) el.appendChild(document.createTextNode(' · ' + fmt(res.data.uploadedAt)));
+        el.appendChild(document.createTextNode(' · '));
+        var a = document.createElement('a');
+        a.href = res.data.url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Open';
+        el.appendChild(a);
+      } else {
+        el.textContent = 'No deck uploaded yet.';
+      }
+    }).catch(function () {});
+  }
   $('deck-upload-btn').addEventListener('click', function () {
     var f = $('deck-file').files && $('deck-file').files[0];
     $('deck-error').hidden = true; $('deck-ok').hidden = true;
     if (!f) { $('deck-error').textContent = 'Choose a PDF first.'; $('deck-error').hidden = false; return; }
     if (f.type && f.type.indexOf('pdf') === -1) { $('deck-error').textContent = 'Please choose a PDF file.'; $('deck-error').hidden = false; return; }
     var btn = $('deck-upload-btn'); btn.disabled = true; btn.textContent = 'Uploading…';
-    var done = function (ok, msg) {
-      btn.disabled = false; btn.textContent = 'Upload deck';
-      if (ok) { $('deck-ok').hidden = false; $('deck-file').value = ''; }
-      else { $('deck-error').textContent = msg || 'Upload failed — please try again.'; $('deck-error').hidden = false; }
-    };
+    var fail = function () { btn.disabled = false; btn.textContent = 'Upload deck'; $('deck-error').textContent = 'Upload failed — please try again.'; $('deck-error').hidden = false; };
     api('/admin/deck-upload-url').then(function (res) {
-      if (res.status !== 200 || !res.data || !res.data.ok || !res.data.signedUrl) { done(false); return; }
+      if (res.status !== 200 || !res.data || !res.data.ok || !res.data.signedUrl) { fail(); return; }
       fetch(res.data.signedUrl, { method: 'PUT', headers: { 'content-type': 'application/pdf', 'x-upsert': 'true' }, body: f })
-        .then(function (up) { done(!!(up && up.ok)); })
-        .catch(function () { done(false); });
-    }).catch(function () { done(false); });
+        .then(function (up) {
+          if (!up || !up.ok) { fail(); return; }
+          api('/admin/deck-saved', { method: 'POST', body: { filename: f.name } }).then(function () {
+            btn.disabled = false; btn.textContent = 'Upload deck';
+            $('deck-ok').hidden = false; $('deck-file').value = '';
+            loadDeckInfo();
+          });
+        }).catch(function () { fail(); });
+    }).catch(function () { fail(); });
   });
 
   $('add-form').addEventListener('submit', function (e) {
