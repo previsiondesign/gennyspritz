@@ -167,6 +167,14 @@ Deno.serve(async (req) => {
     return json(req, 200, { ok: true });
   }
 
+  // ---------- pitch-deck signed upload URL (direct-to-storage, large files OK) ----------
+  if (action === 'deck-upload-url' && req.method === 'GET') {
+    const { data, error } = await supa.storage.from('deck')
+      .createSignedUploadUrl('current.pdf', { upsert: true });
+    if (error || !data) return json(req, 500, { ok: false, reason: 'deck-sign' });
+    return json(req, 200, { ok: true, signedUrl: data.signedUrl });
+  }
+
   if (req.method !== 'POST') return json(req, 405, { ok: false, reason: 'method' });
   const body = await readJson(req);
   if (!body) return json(req, 400, { ok: false, reason: 'bad-json' });

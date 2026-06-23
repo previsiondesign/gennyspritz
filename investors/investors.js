@@ -44,6 +44,11 @@
     var mount = $('fin-mount');
     mount.innerHTML = '';
     mount.appendChild(window.renderFinancials(data.financials));
+    var deckWrap = $('deck-dl-wrap'), deckLink = $('deck-dl');
+    if (deckWrap && deckLink) {
+      if (data.deckUrl) { deckLink.href = data.deckUrl; deckWrap.hidden = false; }
+      else { deckWrap.hidden = true; }
+    }
     show('financials-view');
   }
 

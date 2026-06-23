@@ -55,10 +55,18 @@ Deno.serve(async (req) => {
   const { data: fin } = await supa.from('financials')
     .select('doc,updated_at').eq('id', 1).maybeSingle();
 
+  // Signed link to the current pitch deck, if one's been uploaded (1h validity).
+  let deckUrl: string | null = null;
+  try {
+    const { data: signed } = await supa.storage.from('deck').createSignedUrl('current.pdf', 3600);
+    if (signed?.signedUrl) deckUrl = signed.signedUrl;
+  } catch { /* no deck yet */ }
+
   return json(req, 200, {
     ok: true,
     investor: { name: inv.name },
     financials: fin?.doc ?? DEFAULT_FINANCIALS,
     updatedAt: fin?.updated_at ?? null,
+    deckUrl,
   });
 });

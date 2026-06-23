@@ -176,6 +176,17 @@
           </div>
         </form>
       </div>
+      <div class="ad-card ad-settings">
+        <h3 class="ad-settings-h">Pitch deck</h3>
+        <p class="ad-sub">Upload the current investor pitch deck (PDF). Signed-in investors get a download
+          link on their financials page. A new upload replaces the previous one.</p>
+        <input id="deck-file" type="file" accept="application/pdf,.pdf" style="width:100%;box-sizing:border-box" />
+        <p class="inv-error" id="deck-error" hidden></p>
+        <p class="ad-saved" id="deck-ok" hidden>✓ Uploaded — investors can download it now.</p>
+        <div class="ad-row-actions" style="margin-top:12px">
+          <button type="button" class="btn btn-coral" id="deck-upload-btn">Upload deck</button>
+        </div>
+      </div>
     </section>
 
   </div>
