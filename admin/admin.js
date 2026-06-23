@@ -1034,7 +1034,7 @@
       el.textContent = '';
       if (res.status === 200 && res.data && res.data.ok && res.data.url) {
         el.appendChild(document.createTextNode('Current: ' + (res.data.filename || 'pitch deck (PDF)')));
-        if (res.data.uploadedAt) el.appendChild(document.createTextNode(' · ' + fmt(res.data.uploadedAt)));
+        if (res.data.uploadedAt) el.appendChild(document.createTextNode(' · ' + fmt(res.data.uploadedAt, true)));
         el.appendChild(document.createTextNode(' · '));
         var a = document.createElement('a');
         a.href = res.data.url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Open';

@@ -160,6 +160,8 @@ body { background: var(--linen); }
   border-radius: 5px; background: #fff; font-family: var(--font-body); font-size: .95rem; }
 .ad-settings input:focus { outline: 2px solid var(--sage-deep); }
 .ad-settings .btn { margin-top: 16px; }
+.ad-settings-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+.ad-settings-row .ad-settings { max-width: none; }
 
 /* wide edit dialog + list-editor rows */
 .modal-wide { max-width: 640px; }
@@ -218,4 +220,5 @@ body { background: var(--linen); }
   .ad-row { grid-template-columns: 1fr; }
   .ad-row-actions { justify-content: flex-start; }
   .ad-narrow { margin: 40px auto; }
+  .ad-settings-row { grid-template-columns: 1fr; }
 }
