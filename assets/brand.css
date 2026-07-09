@@ -73,26 +73,29 @@ p { margin: 0 0 1em; }
 }
 .wordmark { font-family: var(--font-display); font-weight: 600; letter-spacing: -.02em; }
 
-/* Real genny wordmark — rendered as a recolorable CSS mask so it inherits
-   currentColor in every context (dark on linen headers, cream on the forest
-   footer, etc.). Only the standalone brand lockups are swapped; mid-sentence
-   .wordmark text (pull-quotes) keeps the display font. Logo ratio 3.374:1. */
+/* Real genny wordmark — the 2026-07 brush-script mark (traced from the July
+   deck cover / new can design), rendered as a recolorable CSS mask so it
+   inherits currentColor in every context (dark on linen headers, cream on the
+   forest footer, etc.). Only the standalone brand lockups are swapped;
+   mid-sentence .wordmark text (pull-quotes) keeps the display font.
+   Logo ratio 1.595:1 (script + under-swash). Old serif mark kept at
+   genny-logo-serif.svg. */
 .brand.wordmark, .hero-word.wordmark, .foot-word.wordmark,
 .ad-brand.wordmark, .inv-brand.wordmark, .inv-footer .wordmark {
   display: inline-block;
-  height: .82em;
-  width: 2.77em;                 /* 3.374 × .82 */
+  height: 1.25em;
+  width: 1.99em;                 /* 1.595 × 1.25 */
   vertical-align: middle;
   line-height: 1;
   letter-spacing: 0;
   background-color: currentColor;
-  -webkit-mask: url(genny-logo.svg) no-repeat left center / contain;
-          mask: url(genny-logo.svg) no-repeat left center / contain;
+  -webkit-mask: url(genny-logo.svg?v=script1) no-repeat left center / contain;
+          mask: url(genny-logo.svg?v=script1) no-repeat left center / contain;
   text-indent: -9999px;
   overflow: hidden;
   white-space: nowrap;
 }
-.hero-word.wordmark { display: block; height: .8em; width: 2.7em; margin: 0; }  /* block = no baseline slack under the logo */
+.hero-word.wordmark { display: block; height: 1.15em; width: 1.83em; margin: 0; }  /* block = no baseline slack under the logo */
 .eyebrow {
   font-family: var(--font-label); text-transform: uppercase;
   letter-spacing: .34em; font-size: .72rem; font-weight: 500; color: var(--muted);
