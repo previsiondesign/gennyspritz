@@ -21,7 +21,7 @@ Open **[`index.html`](index.html)** for the launcher that compares all three.
 - The story behind the name (Genny / Genevieve)
 - The three launch flavors + the future flavor roadmap
 - Why-now market story, founder credibility, product differentiators
-- The $500K raise (SAFE), use-of-capital, and roadmap to launch
+- The $650K raise (SAFE), use-of-capital, and roadmap to launch
 - Launch-list email capture
 
 ### Investor info is gated

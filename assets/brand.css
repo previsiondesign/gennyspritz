@@ -252,7 +252,7 @@ body.nav-open .nav-scrim { opacity: 1; visibility: visible; }
 .fin-lock-card .fin-have-code a { color: var(--forest); font-weight: 700; }
 
 /* financial content primitives */
-.fin-years { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; margin-bottom: 16px; }
+.fin-years { display: grid; grid-template-columns: repeat(auto-fit, minmax(88px,1fr)); gap: 12px; margin-bottom: 16px; }
 .fin-year { background: var(--cream); border: 1px solid var(--line); border-radius: 10px;
   padding: 16px 12px; text-align: center; }
 .fin-year span { display: block; font-family: var(--font-label); text-transform: uppercase;
