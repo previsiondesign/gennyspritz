@@ -111,7 +111,7 @@
         return;
       }
       // Build a mailto fallback so a real message is actually sent in the prototype
-      var to = form.getAttribute('data-mailto') || 'info@gennyspritz.com';
+      var to = form.getAttribute('data-mailto') || 'natasha@gennyspritz.com';
       var subject = form.getAttribute('data-subject') || 'genny — website inquiry';
       var lines = [];
       form.querySelectorAll('input, textarea').forEach(function (f) {

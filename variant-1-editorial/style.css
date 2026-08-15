@@ -150,10 +150,17 @@ blockquote .q { font-family: var(--font-head); color: var(--sage-deep); font-siz
 .founder-copy p { color: #4a4842; font-size: 1.05rem; max-width: 56ch; }
 .founder-quote { font-family: var(--font-head); font-style: italic; font-size: 1.3rem;
   color: var(--forest); border-left: 3px solid var(--sage-deep); padding-left: 22px; margin: 1.4em 0; max-width: 54ch; }
-.brand-strip { list-style: none; display: flex; flex-wrap: wrap; gap: 10px 26px; padding: 22px 0 0; margin: 0;
-  border-top: 1px solid var(--line); }
-.brand-strip li { font-family: var(--font-head); font-size: .95rem; letter-spacing: .04em;
-  color: var(--taupe); text-transform: uppercase; }
+.brand-strip { list-style: none; display: flex; flex-wrap: wrap; gap: 18px 34px; padding: 24px 0 0; margin: 0;
+  border-top: 1px solid var(--line); align-items: center; }
+/* multiply knocks the logos' white boxes out against the linen; rest muted, color on hover */
+.brand-strip img { display: block; width: auto; mix-blend-mode: multiply; filter: grayscale(1);
+  opacity: .75; transition: filter .3s var(--ease), opacity .3s var(--ease); }
+.brand-strip li:hover img { filter: none; opacity: 1; }
+.bl-kendall img { height: 58px; }
+.bl-lindemans img { height: 40px; }
+.bl-ravenswood img { height: 54px; }
+.bl-bread img { height: 26px; }
+.bl-pineridge img { height: 56px; }
 
 /* ---------- investment ---------- */
 .invest { padding: 100px 0; background: var(--forest); color: #eef1ea; }
@@ -231,6 +238,7 @@ blockquote .q { font-family: var(--font-head); color: var(--sage-deep); font-siz
 .foot-tag { font-family: var(--font-label); text-transform: uppercase; letter-spacing: .3em;
   font-size: .68rem; color: var(--taupe-light); margin: 4px 0 0; }
 .footer-contact { display: flex; flex-direction: column; gap: 4px; }
+.footer-contact .foot-note { margin: 0 0 4px; font-size: .95rem; color: #cfccc4; max-width: 36ch; }
 .footer-contact a { text-decoration: none; color: #e7e4dc; }
 .footer-contact a:hover { color: #fff; }
 .footer-legal { font-size: .8rem; color: #908d85; max-width: 30ch; margin: 0; }
