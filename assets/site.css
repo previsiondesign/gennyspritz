@@ -152,7 +152,14 @@ blockquote .q { font-family: var(--font-head); color: var(--sage-deep); font-siz
   color: var(--forest); border-left: 3px solid var(--sage-deep); padding-left: 22px; margin: 1.4em 0; max-width: 54ch; }
 .brand-strip { list-style: none; display: flex; flex-wrap: wrap; gap: 18px 34px; padding: 24px 0 0; margin: 0;
   border-top: 1px solid var(--line); align-items: center; }
-/* multiply knocks the logos' white boxes out against the linen; rest muted, color on hover */
+/* multiply knocks the logos' white boxes out against the linen; rest muted, color on hover.
+   The li carries its own linen backdrop + isolation so the blend is DETERMINISTIC: this strip
+   lives inside .founder-copy.reveal, and while that reveal transitions (opacity <1 + transform)
+   it isolates the blend group — without a backdrop of its own, multiply had nothing to blend
+   against and the logos' white boxes flashed for the ~.8s of the animation. Isolating here
+   pins the blend to this linen, so it renders identically mid-animation and at rest.
+   NOTE: keep this background in sync with .founder's background. */
+.brand-strip li { background: var(--linen); isolation: isolate; }
 .brand-strip img { display: block; width: auto; mix-blend-mode: multiply; filter: grayscale(1);
   opacity: .75; transition: filter .3s var(--ease), opacity .3s var(--ease); }
 .brand-strip li:hover img { filter: none; opacity: 1; }
