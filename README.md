@@ -1,22 +1,14 @@
-# genny — Spritz, Elevated · Website Prototypes
+# genny — Spritz, Elevated
 
-Three website directions for **genny**, a wine-based RTD ("Spritz, Elevated") launching January 2027.
-Each is a complete, self-contained static site that both **promotes the brand** and **invites investors**.
+The website for **genny**, a wine-based RTD ("Spritz, Elevated") launching January 2027. A static site
+that both **promotes the brand** and **invites investors**, backed by a Supabase gated-financials area.
 
 **Live:** `https://gennyspritz.com` (gennyinc.com forwards here; the old
 `https://previsiondesign.github.io/gennyspritz/` URLs redirect automatically).
 
-## The three directions
+Every page carries `noindex` — link-shareable, but not search-indexed before launch.
 
-| # | Direction | Feel | Emphasis |
-|---|-----------|------|----------|
-| 01 | **[Elevated Editorial](variant-1-editorial/)** | Soft, premium, story-led — mirrors the pitch deck. | Brand & the name story lead. |
-| 02 | **[Clean Modern DTC](variant-2-modern/)** | Bright, product-forward — mirrors the can design. | Consumer energy up front. |
-| 03 | **[Investor-Forward](variant-3-investor/)** | Structured, data-confident — mirrors the 1-pager. | Built to raise. |
-
-Open **[`index.html`](index.html)** for the launcher that compares all three.
-
-## What every direction includes
+## What's on the site
 
 - The story behind the name (Genny / Genevieve)
 - The three launch flavors + the future flavor roadmap
@@ -26,9 +18,14 @@ Open **[`index.html`](index.html)** for the launcher that compares all three.
 
 ### Investor info is gated
 
-Confidential financials are **teased only** (≈60.6% gross margin, $18.99 4-pack, path to 68–70%). The
-full financials, projections, and SAFE terms sit behind a **“Request the deck”** form — never exposed on
-the public page. The confidential pitch deck itself is intentionally **not** included in this repo.
+The public page shows **headline figures only** — the detailed model, projections, and SAFE terms sit
+behind the gated investor area. Real financials live **only in the Supabase database**, never in this
+repo (it is public). The confidential pitch deck is likewise **not** in this repo.
+
+The homepage's three teaser stats and the use-of-capital donut are painted from the backend by
+`assets/teaser-sync.js`, so editing the figures in the dashboard updates the homepage automatically.
+The detailed financials preview lower on the page is deliberately hardcoded and **representative** —
+see `handoffs/2026-07-13-deck-sync-rebrand.md` before changing that.
 
 ## Gated investor area + founder dashboard
 
@@ -36,34 +33,39 @@ The repo includes a real gated flow backed by **Supabase** (Postgres + Edge Func
 
 - **`/investors/`** — investors sign in with their email + a unique `GS-XXXX-XXXX` code Natasha
   emails them. Every visit re-validates server-side (and logs a view); revocation is instant.
-  Lost codes can be re-requested (lands in the dashboard).
+  Lost codes can be re-requested (lands in the dashboard). Includes a gated pitch-deck download.
 - **`/admin/`** — Natasha's dashboard (passcode-protected): see access requests, grant (generates a
-  code + opens a ready-to-send email draft), see per-investor view counts/timestamps, revoke or
-  re-issue codes, and **edit every financial figure** investors see, with a live preview.
-- The variant-1 "Request access" modal posts to the backend (with a mailto fallback if it's
-  unreachable). Until the backend is connected, both pages show a graceful "not connected" card.
+  code and emails it automatically via Resend), see per-investor view counts/timestamps, revoke or
+  re-issue codes, upload the current pitch deck, and **edit every financial figure** investors see,
+  with a live preview.
+- The homepage "Request access" modal posts to the backend (with a mailto fallback if it's
+  unreachable). If the backend is unreachable, both pages show a graceful "not connected" card.
 
-Backend bits live in `supabase/` (schema + functions). One-time setup: create a free Supabase
-project, run `supabase/schema.sql` in its SQL editor, deploy the functions
-(`npx supabase functions deploy`), set the `ADMIN_PASSCODE` secret, and put the project URL into
-`assets/api.js`. **No secrets or real figures ever live in this repo** — financials are entered via
-the dashboard and stored only in Postgres.
+Backend bits live in `supabase/` (schema + functions). Deploy functions with
+`npx supabase functions deploy --project-ref <ref>`. **No secrets or real figures ever live in this
+repo** — financials are entered via the dashboard and stored only in Postgres.
 
 ## Forms
 
 The launch-list forms are static prototypes — submitting opens the visitor's email client to
-`natashaik@icloud.com`. To capture real signups, wire them to **Formspree** or **Mailchimp**
+`natasha@gennyspritz.com`. To capture real signups, wire them to **Formspree** or **Mailchimp**
 (the investor-access modal already posts to the Supabase backend).
 
 ## Structure
 
 ```
-index.html                 ← launcher / comparison page
-assets/                    ← shared images, brand.css, shared.js
-variant-1-editorial/       ← Direction 01
-variant-2-modern/          ← Direction 02
-variant-3-investor/        ← Direction 03
+index.html                 ← the site
+assets/                    ← images, brand.css (design system), site.css (homepage), shared.js
+investors/                 ← gated financials (email + code)
+admin/                     ← founder dashboard (passcode)
+supabase/                  ← schema.sql + edge functions
+handoffs/                  ← session handoffs — READ THESE FIRST
+variant-1-editorial/       ← redirect stub only (preserves old shared links → /)
 ```
 
-Product photography, the founder portrait, and the “OG Genny” photo were extracted from genny's pitch
-deck / 1-pager. Wordmark set in *Fraunces*; deck-style headings in *Playfair Display*.
+Three design directions (Elevated Editorial / Clean Modern DTC / Investor-Forward) were prototyped in
+June 2026; Natasha chose **Elevated Editorial**, which became this site. The other two and the
+comparison launcher were removed in August 2026 — see git history if you need them back.
+
+Wordmark is the brush-script genny mark (traced from the deck cover, `assets/genny-logo.svg`);
+headings in *Playfair Display* / *Fraunces*, body *Albert Sans*, labels *Barlow Semi Condensed*.

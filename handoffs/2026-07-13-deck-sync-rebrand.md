@@ -61,8 +61,12 @@ committed). Consequences:
 **Deliberately left alone:**
 - **Favicon** — still the old taupe serif-'g'. The script 'g' crop was tested and is illegible at 32px.
   Needs a real monogram asset from Natasha.
-- **variant-2 / variant-3** archived prototypes still show the OLD can design (incl. `cans-trio.png`).
-  They're noindex prototype archives; only `$650K`/"7-year" text was updated there.
+- ~~**variant-2 / variant-3** archived prototypes still show the OLD can design (incl. `cans-trio.png`).
+  They're noindex prototype archives; only `$650K`/"7-year" text was updated there.~~
+  **SUPERSEDED 2026-08-17:** variants 2/3 and `/directions/` were purged. The live stylesheet moved
+  `variant-1-editorial/style.css` → **`assets/site.css`** (root `index.html` was its only consumer);
+  `variant-1-editorial/index.html` survives as a redirect stub ONLY, to keep old shared links alive.
+  Recover the variants from git history before `ad3a23b` if ever needed.
 - Homepage market stat still reads **"25–55"** (broad market) alongside the new drinker card
   **"Target age 28–38"** (core target). Coexisting on purpose; flagged to Adam, he left it.
 
